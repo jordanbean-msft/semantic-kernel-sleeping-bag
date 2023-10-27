@@ -1,6 +1,10 @@
 @Recommendation_HostAddress = http://localhost:5159
 
-GET {{Recommendation_HostAddress}}/weatherforecast/
+POST {{Recommendation_HostAddress}}/recommendation/
 Accept: application/json
+Content-Type: application/json
 
+{
+  "message": "hello"
+}
 ###

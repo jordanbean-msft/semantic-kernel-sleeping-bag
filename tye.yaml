@@ -1,0 +1,32 @@
+# tye application configuration file
+# read all about it at https://github.com/dotnet/tye
+#
+# when you've given us a try, we'd love to know what you think:
+#    https://aka.ms/AA7q20u
+#
+name: semantic-kernel-sleeping-bag
+services:
+- name: historical-weather-lookup
+  project: src/HistoricalWeatherLookup/HistoricalWeatherLookup.csproj
+  bindings:
+    - port: 53558
+- name: location-lookup
+  project: src/LocationLookup/LocationLookup.csproj
+  bindings:
+    - port: 53560
+- name: order-history
+  project: src/OrderHistory/OrderHistory.csproj
+  bindings:
+    - port: 53562
+- name: product-catalog
+  project: src/ProductCatalog/ProductCatalog.csproj
+  bindings:
+    - port: 53564
+- name: recommendation
+  project: src/Recommendation/Recommendation.csproj
+  bindings:
+    - port: 53566
+- name: recommendation-web-app
+  workingDirectory: src/recommendation-web-app
+  executable: cmd
+  args: '/c npm start'

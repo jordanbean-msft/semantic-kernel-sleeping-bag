@@ -16,7 +16,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/historical-weather-lookup", () =>
+app.MapGet("/historical-weather-lookup", (double latitude, double longitude, DateTime datetime) =>
 {
     return TypedResults.Ok(new HistoricalWeather
     {
