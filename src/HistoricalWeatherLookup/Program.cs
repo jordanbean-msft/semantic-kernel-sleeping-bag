@@ -21,7 +21,7 @@ app.MapGet("/historical-weather-lookup", (double latitude, double longitude, Dat
     return TypedResults.Ok(new HistoricalWeather
     {
         HighestAmbientTemperature = 100,
-        LowestAmbientTemperature = 0
+        LowestAmbientTemperature = -10
     });
 })
 .WithName("GetHistoricalWeather")

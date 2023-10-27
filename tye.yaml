@@ -5,6 +5,8 @@
 #    https://aka.ms/AA7q20u
 #
 name: semantic-kernel-sleeping-bag
+extensions:
+  - name: dapr
 services:
 - name: historical-weather-lookup
   project: src/HistoricalWeatherLookup/HistoricalWeatherLookup.csproj

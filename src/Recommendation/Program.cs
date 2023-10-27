@@ -1,3 +1,6 @@
+using Dapr.Client;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -8,6 +11,8 @@ builder.Services.AddCors(options =>
                    builder.WithOrigins("http://localhost:3000").WithHeaders("content-type");
                });
 });
+
+builder.Services.AddDaprClient();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -26,14 +31,28 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
-app.MapPost("/recommendation", (Request request) =>
+app.MapPost("/recommendation", async (Request request, [FromServices] DaprClient _daprClient) =>
 {
+    var historicalWeather = new HistoricalWeather { HighestAmbientTemperature = 0, LowestAmbientTemperature = 0 };
+
+    try
+    {
+        historicalWeather = await _daprClient.InvokeMethodAsync<HistoricalWeather>(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={1234.5678}&longitude={0987.6543}&dateTime={DateTime.Now}");
+    }
+    catch (Exception ex)
+    {
+        //return TypedResults.Problem(ex.Message);
+    }
+
     return TypedResults.Ok(new Response
     {
-        Message = $"You should do this: {request.Message}"
+        Message = $"""
+    Original message: {request.Message}
+    HistoricalWeather.HighestAmbientTemperature: {historicalWeather.HighestAmbientTemperature}
+    HistoricalWeather.LowestAmbientTemperature: {historicalWeather.LowestAmbientTemperature}
+    """
     });
-})
-.WithName("GetRecommendation")
+}).WithName("GetRecommendation")
 .WithOpenApi();
 
 app.Run();

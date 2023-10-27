@@ -1,4 +1,4 @@
-# template-repository
+# semantic-kernel-sleeping-bag
 
 ![architecture](./.img/architecture.png)
 
@@ -10,7 +10,17 @@
 
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Azure subscription & resource group
+- [Tye](https://github.com/dotnet/tye)
+- [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
+- [Docker](https://docs.docker.com/get-docker/)
+- [Dapr](https://dapr.io/)
 
 ## Deployment
+
+## Run locally
+
+```shell
+tye run
+```
 
 ## Links
