@@ -1,0 +1,6 @@
+@HistoricalWeatherLookup_HostAddress = http://localhost:5186
+
+GET {{HistoricalWeatherLookup_HostAddress}}/historical-weather-lookup/
+Accept: application/json
+
+###
