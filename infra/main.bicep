@@ -42,5 +42,16 @@ module loggingDeployment 'logging.bicep' = {
   }
 }
 
+module cognitiveServicesDeployment 'cognitive-services.bicep' = {
+  scope: az.resourceGroup(resourceGroup.name)
+  name: 'cognitive-services-deployment'
+  params: {
+	cognitiveServicesAccountName: names.outputs.cognitiveServicesAccountName
+    cognitiveServicesAccountOpenAiName: names.outputs.cognitiveServicesAcccountOpenAiName
+    location: location
+	tags: tags
+  }
+}
+
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId

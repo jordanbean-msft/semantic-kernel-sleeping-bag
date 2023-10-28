@@ -4,3 +4,5 @@ var abbrs = loadJsonContent('./abbreviations.json')
 
 output appInsightsName string = '${abbrs.insightsComponents}${resourceToken}'
 output logAnalyticsWorkspaceName string = '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
+output cognitiveServicesAccountName string = '${abbrs.cognitiveServicesAccounts}${resourceToken}'
+output cognitiveServicesAcccountOpenAiName string = '${abbrs.cognitiveServicesAccounts}openai-${resourceToken}'

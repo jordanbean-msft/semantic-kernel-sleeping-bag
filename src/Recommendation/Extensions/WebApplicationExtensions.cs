@@ -1,5 +1,5 @@
-﻿using Dapr.Client;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Recommendation.Services;
 
 namespace Recommendation.Extensions
 {
@@ -14,13 +14,14 @@ namespace Recommendation.Extensions
             return app;
         }
 
-        private static async Task<IResult> OnPostRecommendationAsync(Request request, [FromServices] DaprClient _daprClient)
+        private static async Task<IResult> OnPostRecommendationAsync(Request request, [FromServices] RecommendationService recommendationService)
         {
-            HistoricalWeather? historicalWeather;
+            HistoricalWeather? historicalWeather = new HistoricalWeather { HighestAmbientTemperature = 0, LowestAmbientTemperature = 0 };
 
             try
             {
-                historicalWeather = await _daprClient.InvokeMethodAsync<HistoricalWeather>(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={1234.5678}&longitude={0987.6543}&dateTime={DateTime.Now}");
+                var response = await recommendationService.ResponseAsync(request);
+                //historicalWeather = response.Message
             }
             catch (Exception ex)
             {

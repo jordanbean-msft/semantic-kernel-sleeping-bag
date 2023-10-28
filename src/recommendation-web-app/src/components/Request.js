@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import Response from "./Response";
 
 export default function Request() {
-    const [request, setRequest] = useState("");
+    const [request, setRequest] = useState("latitude: 30.182116, longitude: -95.491479");
     const [response, setResponse] = useState("");
     const [error, setError] = useState(null);
     const [status, setStatus] = useState("");

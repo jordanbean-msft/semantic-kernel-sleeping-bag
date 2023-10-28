@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using Recommendation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,11 +14,23 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDaprClient();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAzureServices();
+
+var config = builder.Configuration;
+string connectionString = config["ApplicationInsights:ConnectionString"];
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>(logLevel => logLevel == LogLevel.Information);
+    loggingBuilder.SetMinimumLevel(LogLevel.Information);
+});
+
+builder.Services.AddApplicationInsightsTelemetryWorkerService(options =>
+{
+    options.ConnectionString = connectionString;
+});
 
 var app = builder.Build();
 
