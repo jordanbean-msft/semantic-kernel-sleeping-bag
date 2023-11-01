@@ -40,7 +40,7 @@ export default function Request() {
                     />
                 <Button variant="contained" type="submit">
                     Submit
-                    </Button>
+                </Button>
             </form>
                 </CardContent>
             </Card>
@@ -74,6 +74,7 @@ export default function Request() {
     );
 
     async function handleSubmit(e) {
+        setResponse("");
         e.preventDefault();
         const response = await fetch(`${process.env.REACT_APP_RECOMMENDATION_API_URL}/recommendation`, {
             method: "POST",

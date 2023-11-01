@@ -57,7 +57,7 @@ namespace Recommendation.Services
             var context = _kernel.CreateNewContext();
             var planner = new StepwisePlanner(_kernel);
             var username = "jordanbean";
-            var plan = planner.CreatePlan($"You are a customer support chatbot. The username is {username}. You should answer the question posed by the user here: {request.Message}. Your response should be in JSON format.");
+            var plan = planner.CreatePlan($"You are a customer support chatbot. The username is {username}. The current month is {DateTime.Now.Month} You should answer the question posed by the user here: {request.Message}.");
             var response = await plan.InvokeAsync(context);
 
             return new Response

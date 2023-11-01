@@ -16,16 +16,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-Dictionary<string, ProductCatalogItem> orderHistory = new Dictionary<string, ProductCatalogItem>() { {"jordanbean", new ProductCatalogItem
+Dictionary<string, ProductCatalogItem> productCatalog = new()
+{
     {
-        ProductId = "12345",
-        ProductName = "Elite Eco Sleeping Bag",
-        ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Ambient Temperature Supported: -20 Fahrenheit"
-    }} };
+        "12345",
+        new ProductCatalogItem
+        {
+            ProductId = "12345",
+            ProductName = "Elite Eco Sleeping Bag",
+            ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Ambient Temperature Supported: -20 Fahrenheit"
+        }
+    }
+};
 
 app.MapGet("/productCatalog/{id}", (string id) =>
 {
-    var response = orderHistory.TryGetValue(id, out var productCatalogItem) ? productCatalogItem : null;
+    var response = productCatalog.TryGetValue(id, out var productCatalogItem) ? productCatalogItem : null;
 
     return productCatalogItem;
 })

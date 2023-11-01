@@ -13,10 +13,10 @@ namespace Recommendation.Plugins
             _daprClient = daprClient;
         }
 
-        [SKFunction, Description("Given a C# double latitude, C# double longitude, and C# DateTime date/time, returns the historical weather for that location.")]
-        public async Task<string> HistoricalWeatherLookup(double latitude, double longitude, DateTime dateTime)
+        [SKFunction, Description("Given a C# double latitude, C# double longitude, and C# int month of the year, returns the historical weather for that location.")]
+        public async Task<string> HistoricalWeatherLookup(double latitude, double longitude, int monthOfYear)
         {
-            var result = await _daprClient.InvokeMethodAsync<HistoricalWeather>(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={1234.5678}&longitude={0987.6543}&dateTime={DateTime.Now}");
+            var result = await _daprClient.InvokeMethodAsync<HistoricalWeather>(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={latitude}&longitude={longitude}&monthOfYear={monthOfYear}");
 
             return JsonSerializer.Serialize(result);
         }

@@ -16,12 +16,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/orderHistory/{username}", (string username) =>
+Dictionary<string, OrderHistory> orderHistory = new()
 {
-    var response = new List<OrderHistory> {
-        new() {
+    {
+    "jordanbean",
+    new OrderHistory
+    {
             OrderId = "1",
-            CustomerId = username,
+            CustomerId = "jordanbean",
             OrderDate = "2021-01-01",
             OrderTotal = "10",
             OrderStatus = "Shipped",
@@ -33,10 +35,18 @@ app.MapGet("/orderHistory/{username}", (string username) =>
                     ProductQuantity = "1"
                 }
             }
-        }
-    };
+    }
+    }
+};
 
-    return response;
+app.MapGet("/orderHistory/{username}", (string username) =>
+{
+    OrderHistory response = null;
+    if (orderHistory.TryGetValue(username, out var orderHistoryItem))
+    {
+        response = orderHistoryItem;
+    }
+    return TypedResults.Ok(response);
 })
 .WithName("GetOrderHistory")
 .WithOpenApi();

@@ -1,3 +1,5 @@
+using HistoricalWeatherLookup;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,13 +18,31 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/historical-weather-lookup", (double latitude, double longitude, DateTime datetime) =>
+Dictionary<HistoricalWeatherKey, HistoricalWeather> historicalWeather = new()
 {
-    return TypedResults.Ok(new HistoricalWeather
     {
-        HighestAmbientTemperature = 100,
-        LowestAmbientTemperature = -10
-    });
+        new HistoricalWeatherKey {
+            Latitude = -41.814099,
+            Longitude = -68.907384,
+            Month = 11
+        },
+        new HistoricalWeather
+        {
+            HighestAmbientTemperature = 100,
+            LowestAmbientTemperature = -10
+        }
+    }
+};
+
+app.MapGet("/historical-weather-lookup", (double latitude, double longitude, int monthOfYear) =>
+{
+    HistoricalWeather historicalWeatherResponse = null;
+    if (historicalWeather.TryGetValue(new HistoricalWeatherKey { Latitude = latitude, Longitude = longitude, Month = monthOfYear }, out var historicalWeatherItem))
+    {
+        historicalWeatherResponse = historicalWeatherItem;
+    }
+
+    return TypedResults.Ok(historicalWeatherResponse);
 })
 .WithName("GetHistoricalWeather")
 .WithOpenApi();
