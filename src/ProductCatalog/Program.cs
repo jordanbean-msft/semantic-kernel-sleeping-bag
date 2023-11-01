@@ -16,29 +16,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+Dictionary<string, ProductCatalogItem> orderHistory = new Dictionary<string, ProductCatalogItem>() { {"jordanbean", new ProductCatalogItem
+    {
+        ProductId = "12345",
+        ProductName = "Elite Eco Sleeping Bag",
+        ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Ambient Temperature Supported: -20 Fahrenheit"
+    }} };
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/productCatalog/{id}", (string id) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var response = orderHistory.TryGetValue(id, out var productCatalogItem) ? productCatalogItem : null;
+
+    return productCatalogItem;
 })
-.WithName("GetWeatherForecast")
+.WithName("GetProductCatalogItem")
 .WithOpenApi();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -3,6 +3,7 @@ using Dapr.Client;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Planners;
 using Recommendation.Plugins;
+using System.Text.Json;
 
 namespace Recommendation.Services
 {
@@ -45,21 +46,27 @@ namespace Recommendation.Services
         private void RegisterPlugins()
         {
             _kernel.ImportFunctions(new HistoricalWeatherLookupPlugin(_daprClient), "HistoricalWeatherLookupPlugin");
+            _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
+            _kernel.ImportFunctions(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
+            _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
+            _kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins/Recommendation");
         }
 
         public async Task<Response> ResponseAsync(Request request)
         {
             var context = _kernel.CreateNewContext();
             var planner = new StepwisePlanner(_kernel);
-            var plan = planner.CreatePlan($"Find the historical weather associated with the following GPS coordinates: {request.Message}. Your response should be in JSON format.");
+            var username = "jordanbean";
+            var plan = planner.CreatePlan($"You are a customer support chatbot. The username is {username}. You should answer the question posed by the user here: {request.Message}. Your response should be in JSON format.");
             var response = await plan.InvokeAsync(context);
 
             return new Response
             {
-                Message = response.GetValue<string>()
+                FunctionCount = response.Metadata["functionCount"].ToString(),
+                Iterations = int.Parse(response.Metadata["iterations"].ToString()),
+                StepCount = int.Parse(response.Metadata["stepCount"].ToString()),
+                OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString())
             };
-
-
         }
     }
 }

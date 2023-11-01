@@ -1,0 +1,26 @@
+﻿{
+  "schema": 1,
+  "type": "completion",
+  "description": "Given a sleeping bag lowest recommended temperature and a lowest expected weather temperature, return if the sleeping bag is suitable",
+  "completion": {
+    "max_tokens": 500,
+    "temperature": 0.0,
+    "top_p": 0.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      {
+        "name": "lowestAmbientWeatherTemperature",
+        "description": "The loweset ambient weather temperature expected.",
+        "defaultValue": ""
+      },
+      {
+        "name": "lowestRecommendedTemperature",
+        "description": "The lowest recommended temperature for the sleeping bag.",
+        "defaultValue": ""
+      }
+    ]
+  }
+}

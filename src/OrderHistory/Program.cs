@@ -16,29 +16,30 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/orderHistory/{username}", (string username) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var response = new List<OrderHistory> {
+        new() {
+            OrderId = "1",
+            CustomerId = username,
+            OrderDate = "2021-01-01",
+            OrderTotal = "10",
+            OrderStatus = "Shipped",
+            OrderItems = new List<OrderItems> {
+                new() {
+                    ProductId = "12345",
+                    ProductName = "Eco Elite Sleeping Bag",
+                    ProductPrice = "10",
+                    ProductQuantity = "1"
+                }
+            }
+        }
+    };
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    return response;
 })
-.WithName("GetWeatherForecast")
+.WithName("GetOrderHistory")
 .WithOpenApi();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -1,0 +1,2 @@
+﻿Bot: Given a lowest ambient weather temperature of {{ $lowestAmbientWeatherTemperature }} and a lowest temperature supported by a sleeping bag, return if the sleeping bag is suitable for the weather in the month specified {{ $month }}.
+
