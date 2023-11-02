@@ -1,50 +1,54 @@
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import { Button } from "@mui/material";
 import Response from "./Response";
 import * as React from 'react';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material/styles';
+import './Request.css'
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
+import { green } from '@mui/material/colors';
+import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
+import CheckIcon from '@mui/icons-material/Check';
+import SaveIcon from '@mui/icons-material/Save';
 
 export default function Request() {
     const [request, setRequest] = useState("Will my sleeping bag work for my trip to Patagonia next month?");
     const [response, setResponse] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState("");
 
     return (
-        <>
-            <Card xs={{ minWidth: 275 }}>
-            <CardContent>
-            <form onSubmit={handleSubmit}>
+        <Stack>
+            <Paper xs={{ minWidth: 275 }}>
+            <form onSubmit={handleSubmit} className="table">
                 <TextField
                     id="request"
                     label="Request"
                     variant="outlined"
                     value={request}
                     onChange={(e) => setRequest(e.target.value)}
-                    />
+                    multiline />
                 <Button variant="contained" type="submit">
                     Submit
-                </Button>
+                    </Button>
+                    {
+                        loading && (
+                            <CircularProgress />
+                        )
+                    }
             </form>
-                </CardContent>
-            </Card>
-            <div>
+            </Paper>
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                     <TableHead>
@@ -69,26 +73,31 @@ export default function Request() {
 </TableBody>
                 </Table>
                 </TableContainer>
-                </div>
-            </>
+            </Stack>
     );
 
     async function handleSubmit(e) {
-        setResponse("");
-        e.preventDefault();
-        const response = await fetch(`${process.env.REACT_APP_RECOMMENDATION_API_URL}/recommendation`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message: e.target.request.value }),
-        }).then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        if (!loading) {
+            setSuccess(false);
+            setLoading(true);
+            setResponse("");
+            e.preventDefault();
+            const response = await fetch(`${process.env.REACT_APP_RECOMMENDATION_API_URL}/recommendation`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: e.target.request.value }),
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-            return response.json();
-        });
-        setResponse(response);
+                return response.json();
+            });
+            setResponse(response);
+            setSuccess(true);
+            setLoading(false);
+        }
     }
 }

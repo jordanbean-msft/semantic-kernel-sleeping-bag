@@ -1,0 +1,2 @@
+﻿Bot: If the lowest ambient weather temperature is {{ $lowestAmbientWeatherTemperature }} greater than the lowest temperature supported by a sleeping bag {{ $lowestRecommendedTemperature }} is, return that the sleeping bag is appropriate.
+

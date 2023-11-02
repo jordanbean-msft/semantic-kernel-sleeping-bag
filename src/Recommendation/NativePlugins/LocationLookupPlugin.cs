@@ -13,7 +13,7 @@ namespace Recommendation.Plugins
             _daprClient = daprClient;
         }
 
-        [SKFunction, Description("Given a C# string location, returns the latitude & longitude of that location.")]
+        [SKFunction, Description("Given a string name of a location, returns the latitude & longitude GPS coordinates of that location.")]
         public async Task<string> LocationLookup(string location)
         {
             var result = await _daprClient.InvokeMethodAsync<LatLong>(HttpMethod.Get, "location-lookup", $"location?nameOflocation={location}");

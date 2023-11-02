@@ -49,7 +49,7 @@ namespace Recommendation.Services
             _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
             _kernel.ImportFunctions(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
             _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
-            _kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins/Recommendation");
+            //_kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins", "RecommendationPlugin");
         }
 
         public async Task<Response> ResponseAsync(Request request)
@@ -57,7 +57,7 @@ namespace Recommendation.Services
             var context = _kernel.CreateNewContext();
             var planner = new StepwisePlanner(_kernel);
             var username = "jordanbean";
-            var plan = planner.CreatePlan($"You are a customer support chatbot. The username is {username}. The current month is {DateTime.Now.Month} You should answer the question posed by the user here: {request.Message}.");
+            var plan = planner.CreatePlan($"You are a customer support chatbot. The username is {username}. The current month is {DateTime.Now.Month} You should answer the question posed by the user here: {request.Message}. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
             var response = await plan.InvokeAsync(context);
 
             return new Response

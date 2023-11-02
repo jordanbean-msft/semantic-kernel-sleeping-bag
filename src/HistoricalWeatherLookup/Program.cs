@@ -24,12 +24,12 @@ Dictionary<HistoricalWeatherKey, HistoricalWeather> historicalWeather = new()
         new HistoricalWeatherKey {
             Latitude = -41.814099,
             Longitude = -68.907384,
-            Month = 11
+            Month = 12
         },
         new HistoricalWeather
         {
             HighestAmbientTemperature = 100,
-            LowestAmbientTemperature = -10
+            LowestAmbientTemperature = 10
         }
     }
 };

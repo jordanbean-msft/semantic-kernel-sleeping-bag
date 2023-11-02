@@ -24,7 +24,7 @@ Dictionary<string, ProductCatalogItem> productCatalog = new()
         {
             ProductId = "12345",
             ProductName = "Elite Eco Sleeping Bag",
-            ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Ambient Temperature Supported: -20 Fahrenheit"
+            ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Ambient Temperature Supported: 5 Fahrenheit"
         }
     }
 };

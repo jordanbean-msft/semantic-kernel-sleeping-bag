@@ -1,6 +1,6 @@
-@HistoricalWeatherLookup_HostAddress = http://localhost:5186
+@HistoricalWeatherLookup_HostAddress = http://localhost:53558
 
-GET {{HistoricalWeatherLookup_HostAddress}}/historical-weather-lookup/
+GET {{HistoricalWeatherLookup_HostAddress}}/historical-weather-lookup?latitude=-41.814099&longitude=-68.907384&monthOfYear=11
 Accept: application/json
 
 ###
