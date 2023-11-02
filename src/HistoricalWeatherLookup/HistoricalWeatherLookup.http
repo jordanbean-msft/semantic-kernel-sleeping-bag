@@ -1,6 +1,13 @@
 @HistoricalWeatherLookup_HostAddress = http://localhost:53558
 
-GET {{HistoricalWeatherLookup_HostAddress}}/historical-weather-lookup?latitude=-41.814099&longitude=-68.907384&monthOfYear=11
-Accept: application/json
+POST {{HistoricalWeatherLookup_HostAddress}}/historical-weather-lookup
+Content-Type: application/json
 
+{
+  "historicalWeatherInput": {
+    "latitude": -41.814099,
+    "longitude": -68.907384,
+    "monthOfYear: 11
+  }
+}
 ###

@@ -1,9 +1,3 @@
-# tye application configuration file
-# read all about it at https://github.com/dotnet/tye
-#
-# when you've given us a try, we'd love to know what you think:
-#    https://aka.ms/AA7q20u
-#
 name: semantic-kernel-sleeping-bag
 extensions:
   - name: dapr
@@ -28,6 +22,14 @@ services:
   project: src/Recommendation/Recommendation.csproj
   bindings:
     - port: 53566
+- name: historical-sports-scores-lookup
+  project: src/HistoricalSportsScores/HistoricalSportsScores.csproj
+  bindings:
+    - port: 53568
+- name: tv-character-names-lookup
+  project: src/TVCharacterNames/TVCharacterNames.csproj
+  bindings:
+    - port: 53570  
 - name: recommendation-web-app
   workingDirectory: src/recommendation-web-app
   executable: cmd

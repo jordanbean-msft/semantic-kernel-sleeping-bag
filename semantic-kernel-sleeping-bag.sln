@@ -34,6 +34,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{A2211EED
 		infra\resource-names.bicep = infra\resource-names.bicep
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitTVShows", "src\HistoricalSportsScores\HitTVShows.csproj", "{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitMovies", "src\TVCharacterNames\HitMovies.csproj", "{67BADDB6-9EF1-412B-88DF-57D671D715B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +70,14 @@ Global
 		{961DE240-E691-42CF-A2D7-1710CC8E31DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{961DE240-E691-42CF-A2D7-1710CC8E31DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{961DE240-E691-42CF-A2D7-1710CC8E31DF}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67BADDB6-9EF1-412B-88DF-57D671D715B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67BADDB6-9EF1-412B-88DF-57D671D715B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67BADDB6-9EF1-412B-88DF-57D671D715B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67BADDB6-9EF1-412B-88DF-57D671D715B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

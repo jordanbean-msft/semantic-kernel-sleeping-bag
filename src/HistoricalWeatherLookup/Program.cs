@@ -18,13 +18,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-Dictionary<HistoricalWeatherKey, HistoricalWeather> historicalWeather = new()
+Dictionary<HistoricalWeatherInput, HistoricalWeather> historicalWeather = new()
 {
     {
-        new HistoricalWeatherKey {
+        new HistoricalWeatherInput {
             Latitude = -41.814099,
             Longitude = -68.907384,
-            Month = 12
+            MonthOfYear = 12
         },
         new HistoricalWeather
         {
@@ -37,7 +37,7 @@ Dictionary<HistoricalWeatherKey, HistoricalWeather> historicalWeather = new()
 app.MapGet("/historical-weather-lookup", (double latitude, double longitude, int monthOfYear) =>
 {
     HistoricalWeather historicalWeatherResponse = null;
-    if (historicalWeather.TryGetValue(new HistoricalWeatherKey { Latitude = latitude, Longitude = longitude, Month = monthOfYear }, out var historicalWeatherItem))
+    if (historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out var historicalWeatherItem))
     {
         historicalWeatherResponse = historicalWeatherItem;
     }
