@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import Request from './Request'
+import Request from './Request/Request'
 
 const pages = ['Chatbot'];
 const settings = ['Profile', 'Logout'];
