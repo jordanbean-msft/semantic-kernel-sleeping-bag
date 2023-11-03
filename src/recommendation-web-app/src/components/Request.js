@@ -2,23 +2,15 @@ import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Response from "./Response";
 import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
 import './Request.css'
-import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { green } from '@mui/material/colors';
 import Button from '@mui/material/Button';
-import Fab from '@mui/material/Fab';
-import CheckIcon from '@mui/icons-material/Check';
-import SaveIcon from '@mui/icons-material/Save';
+import Grid from '@mui/material/Grid';
+import FormControl from '@mui/material/FormControl';
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
 
 export default function Request() {
     const [request, setRequest] = useState("Will my sleeping bag work for my trip to Patagonia next month?");
@@ -30,50 +22,29 @@ export default function Request() {
 
     return (
         <Stack>
-            <Paper xs={{ minWidth: 275 }}>
-            <form onSubmit={handleSubmit} className="table">
-                <TextField
-                    id="request"
-                    label="Request"
-                    variant="outlined"
-                    value={request}
-                    onChange={(e) => setRequest(e.target.value)}
-                    multiline />
-                <Button variant="contained" type="submit">
-                    Submit
+            <Paper>
+                <form onSubmit={handleSubmit} className="table">
+                    <TextField
+                        id="request"
+                        label="Request"
+                        variant="outlined"
+                        value={request}
+                        onChange={(e) => setRequest(e.target.value)}
+                        multiline />
+                    <Button variant="contained" type="submit">
+                        Submit
                     </Button>
                     {
                         loading && (
                             <CircularProgress />
                         )
                     }
-            </form>
+                </form>
             </Paper>
-                <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                    <TableHead>
-                            <TableCell>Action</TableCell>
-                            <TableCell>Thought</TableCell>
-                        <TableCell>Observation</TableCell>
-                        <TableCell>Original Response</TableCell>
-                        <TableCell>Final Answer</TableCell>
-                    </TableHead>
-                    <TableBody>
-                        {response?.openAIMessages?.map((row) => (
-                            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                                <TableCell component="th" scope="response">
-                                    {row.action}
-                                </TableCell>
-                                <TableCell>{row.thought}</TableCell>
-                                <TableCell>{row.observation}</TableCell>
-                                <TableCell>{row.original_response}</TableCell>
-                                <TableCell>{row.final_answer}</TableCell>
-                            </TableRow>))
-                        }
-</TableBody>
-                </Table>
-                </TableContainer>
-            </Stack>
+            {
+                response && (<Response response={response} />)
+            }
+        </Stack>
     );
 
     async function handleSubmit(e) {
@@ -101,3 +72,5 @@ export default function Request() {
         }
     }
 }
+
+

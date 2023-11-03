@@ -46,9 +46,9 @@ namespace Recommendation.Services
         private void RegisterPlugins()
         {
             _kernel.ImportFunctions(new HistoricalWeatherLookupPlugin(_daprClient), "HistoricalWeatherLookupPlugin");
-            //_kernel.ImportFunctions(new HistoricalSportsScoresPlugin(_daprClient), "HistoricalSportsScoresPlugin");
+            //_kernel.ImportFunctions(new HitMoviesPlugin(_daprClient), "HitMoviesPlugin");
             _kernel.ImportFunctions(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
-            //_kernel.ImportFunctions(new TVCharacterNamesPlugin(_daprClient), "TVCharacterNamesPlugin");
+            //_kernel.ImportFunctions(new HitTVShowsPlugin(_daprClient), "HitTVShowsPlugin");
             _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
             _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
             //_kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins", "RecommendationPlugin");

@@ -16,23 +16,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-List<HistoricalSportsScore> sportsResults = new()
+List<HitMovie> hits = new()
 {
-    new HistoricalSportsScore{
-        Team1 = "Texas Tech",
-        Team2 = "Minnesota",
-        Team1Score = 44,
-        Team2Score = 41,
-        GameDate = DateTime.Parse("Dec 29, 2006"),
-        Sport = "Football",
-        TeamThatWon = "Texas Tech"
+    new(){
+        Title = "GalaxyQuest",
+        Actors = new(){ "Rainn Wilson" },
+        Tags = new(){ "comedy", "sci-fi" }
     }
 };
 
-app.MapGet("/historicalSportsScores", () =>
+app.MapGet("/hitMoviesByTag", (List<string> tags) =>
 {
-    return TypedResults.Ok(sportsResults);
+    return TypedResults.Ok(hits.Find(x => x.Tags.Intersect(tags).Any()));
 })
-.WithName("GetHistoricalSportsScores");
+.WithName("GetHitMoviesByTag")
+.WithOpenApi();
 
 app.Run();
+

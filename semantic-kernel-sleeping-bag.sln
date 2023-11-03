@@ -34,9 +34,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{A2211EED
 		infra\resource-names.bicep = infra\resource-names.bicep
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitTVShows", "src\HistoricalSportsScores\HitTVShows.csproj", "{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitTVShows", "src\HitTVShows\HitTVShows.csproj", "{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitMovies", "src\TVCharacterNames\HitMovies.csproj", "{67BADDB6-9EF1-412B-88DF-57D671D715B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitMovies", "src\HitMovies\HitMovies.csproj", "{67BADDB6-9EF1-412B-88DF-57D671D715B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

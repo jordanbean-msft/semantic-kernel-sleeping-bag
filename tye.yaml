@@ -22,15 +22,21 @@ services:
   project: src/Recommendation/Recommendation.csproj
   bindings:
     - port: 53566
-- name: historical-sports-scores-lookup
-  project: src/HistoricalSportsScores/HistoricalSportsScores.csproj
+- name: hit-movies-lookup
+  project: src/HitMovies/HitMovies.csproj
   bindings:
     - port: 53568
-- name: tv-character-names-lookup
-  project: src/TVCharacterNames/TVCharacterNames.csproj
+- name: hit-tv-shows-lookup
+  project: src/HitTVShows/HitTVShows.csproj
   bindings:
     - port: 53570  
 - name: recommendation-web-app
   workingDirectory: src/recommendation-web-app
   executable: cmd
   args: '/c npm start'
+  liveness:
+    http:
+      path: /healthz
+  readiness:
+    http:
+      path: /healthz

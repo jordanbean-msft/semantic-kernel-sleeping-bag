@@ -16,21 +16,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-List<HitMovie> hits = new()
+List<HitTVShow> hits = new()
 {
     new(){
-        Title = "GalaxyQuest",
-        Actors = { "Rainn Wilson" },
-        Tags = { "comedy", "sci-fi" }
+        Title = "The Office",
+        Tags = new(){ "comedy", "documentary" },
+        Actors = new(){ "Steve Carell", "Jenna Fischer", "John Krasinski", "Rainn Wilson" },
+        SeasonAiredYears = new(){ 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 }
     }
 };
 
-app.MapGet("/hitMoviesByTag", (List<string> tags) =>
+app.MapGet("/hitTVShowsByYear", (int year) =>
 {
-    return TypedResults.Ok("");
+    return TypedResults.Ok(hits.Find(x => x.SeasonAiredYears.Contains(year)));
 })
-.WithName("GetTVCharacterNames")
+.WithName("GetHitTVShows")
 .WithOpenApi();
 
 app.Run();
-

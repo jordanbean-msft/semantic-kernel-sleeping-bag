@@ -5,10 +5,10 @@ using System.Text.Json;
 
 namespace Recommendation.Plugins
 {
-    public class HistoricalSportsScoresPlugin
+    public class HitMoviesPlugin
     {
         private readonly DaprClient _daprClient;
-        public HistoricalSportsScoresPlugin(DaprClient daprClient)
+        public HitMoviesPlugin(DaprClient daprClient)
         {
             _daprClient = daprClient;
         }
