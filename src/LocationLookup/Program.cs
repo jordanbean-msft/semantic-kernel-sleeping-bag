@@ -1,4 +1,5 @@
 using LocationLookup;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,9 +28,11 @@ Dictionary<string, LatLong> locations = new()
     } }
 };
 
-app.MapGet("/location", (string nameOfLocation) =>
+app.MapGet("/location", Results<Ok<LatLong>, NotFound<string>> (string nameOfLocation) =>
 {
-    return locations[nameOfLocation];
+    LatLong location = null;
+    locations.TryGetValue(nameOfLocation, out location);
+    return location != null ? TypedResults.Ok(location) : TypedResults.NotFound($"No location found for {nameOfLocation}.");
 })
 .WithName("GetLocation")
 .WithOpenApi();

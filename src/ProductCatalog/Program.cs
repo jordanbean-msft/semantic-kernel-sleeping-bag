@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -24,16 +26,17 @@ Dictionary<string, ProductCatalogItem> productCatalog = new()
         {
             ProductId = "12345",
             ProductName = "Elite Eco Sleeping Bag",
-            ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Ambient Temperature Supported: 5 Fahrenheit"
+            ProductDescription = "Weight: 5 lbs, Length: 6 feet, Lowest Temperature Supported: 5 Fahrenheit"
         }
     }
 };
 
-app.MapGet("/productCatalog/{id}", (string id) =>
+app.MapGet("/productCatalog/{id}", Results<Ok<ProductCatalogItem>, NotFound<string>> (string id) =>
 {
-    var response = productCatalog.TryGetValue(id, out var productCatalogItem) ? productCatalogItem : null;
+    ProductCatalogItem productCatalogItem = null;
+    productCatalog.TryGetValue(id, out productCatalogItem);
 
-    return productCatalogItem;
+    return productCatalogItem != null ? TypedResults.Ok(productCatalogItem) : TypedResults.NotFound($"No product catalog item found for id ${id}");
 })
 .WithName("GetProductCatalogItem")
 .WithOpenApi();

@@ -13,7 +13,7 @@ namespace Recommendation.Plugins
             _daprClient = daprClient;
         }
 
-        [SKFunction, Description("Get the historical weather for a location for a month. Make sure and pass in the month of the year the user requested.")]
+        [SKFunction, Description("Get the historical weather for a location for a month. Make sure and pass in the month of the year the user requested. The weather temperatures will be returned in Fahrenheit.")]
         public async Task<string> HistoricalWeatherLookup(
             [Description("The double latitude of the location to lookup historical weather for")] double latitude,
             [Description("The double longitude of the location to lookup historical weather for")] double longitude,

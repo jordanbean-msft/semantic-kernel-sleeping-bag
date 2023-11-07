@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -39,14 +41,14 @@ Dictionary<string, OrderHistory> orderHistory = new()
     }
 };
 
-app.MapGet("/orderHistory/{username}", (string username) =>
+app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory>, NotFound<string>> (string username) =>
 {
     OrderHistory response = null;
     if (orderHistory.TryGetValue(username, out var orderHistoryItem))
     {
         response = orderHistoryItem;
     }
-    return TypedResults.Ok(response);
+    return response != null ? TypedResults.Ok(response) : TypedResults.NotFound($"No order history found for user ${username}");
 })
 .WithName("GetOrderHistory")
 .WithOpenApi();

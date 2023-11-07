@@ -60,7 +60,7 @@ namespace Recommendation.Services
             var contextVariables = new ContextVariables
             {
                 ["username"] = "jordanbean",
-                ["current date"] = DateTime.Now.ToString("MM-dd-yyyy"),
+                ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
                 ["message"] = request.Message
             };
 
@@ -68,7 +68,7 @@ namespace Recommendation.Services
 
             var planner = new StepwisePlanner(_kernel);
 
-            var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
+            var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
 
             var response = await plan.InvokeAsync(context);
 
