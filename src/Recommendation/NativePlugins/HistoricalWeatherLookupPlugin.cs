@@ -13,8 +13,11 @@ namespace Recommendation.Plugins
             _daprClient = daprClient;
         }
 
-        [SKFunction, Description("Given a string latitude, string longitude, and integer month of the year, returns the historical weather for that location for that month. The latitude & longitude and the specific GPS coordinates for a given location. Make sure and pass in the user requested month of the year.")]
-        public async Task<string> HistoricalWeatherLookup(double latitude, double longitude, int monthOfYear)
+        [SKFunction, Description("Get the historical weather for a location for a month. Make sure and pass in the month of the year the user requested.")]
+        public async Task<string> HistoricalWeatherLookup(
+            [Description("The double latitude of the location to lookup historical weather for")] double latitude,
+            [Description("The double longitude of the location to lookup historical weather for")] double longitude,
+            [Description("The int month of the year to lookup historical weather for")] int monthOfYear)
         {
             var result = await _daprClient.InvokeMethodAsync<HistoricalWeather>(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={latitude}&longitude={longitude}&monthOfYear={monthOfYear}");
 

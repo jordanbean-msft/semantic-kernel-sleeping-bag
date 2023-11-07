@@ -13,8 +13,8 @@ namespace Recommendation.Plugins
             _daprClient = daprClient;
         }
 
-        [SKFunction, Description("Given a string username, returns the order history for that username, including all the products they purchased (which includes the product ID). This is a list of what the user owns.")]
-        public async Task<string> OrderHistoryLookup(string username)
+        [SKFunction, Description("Get the order history for a user, including all the products they purchased (which includes the product ID). This is a list of what the user owns.")]
+        public async Task<string> OrderHistoryLookup([Description("The string username of the user")] string username)
         {
             var result = await _daprClient.InvokeMethodAsync<OrderHistory>(HttpMethod.Get, "order-history", $"orderHistory/{username}");
 

@@ -1,6 +1,7 @@
 ﻿using Azure.AI.OpenAI;
 using Dapr.Client;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Planners;
 using Recommendation.Plugins;
 using System.Text.Json;
@@ -56,10 +57,18 @@ namespace Recommendation.Services
 
         public async Task<Response> ResponseAsync(Request request)
         {
-            var context = _kernel.CreateNewContext();
+            var contextVariables = new ContextVariables
+            {
+                ["username"] = "jordanbean",
+                ["monthOfYear"] = DateTime.Now.Month.ToString(),
+                ["message"] = request.Message
+            };
+
+            var context = _kernel.CreateNewContext(contextVariables);
+
             var planner = new StepwisePlanner(_kernel);
-            var username = "jordanbean";
-            var plan = planner.CreatePlan($"You are a customer support chatbot. The username is {username}. The current month is {DateTime.Now.Month} You should answer the question posed by the user here: {request.Message}. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
+
+            var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
 
             var response = await plan.InvokeAsync(context);
 
