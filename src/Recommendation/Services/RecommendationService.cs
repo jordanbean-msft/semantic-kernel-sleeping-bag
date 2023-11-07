@@ -60,7 +60,7 @@ namespace Recommendation.Services
             var contextVariables = new ContextVariables
             {
                 ["username"] = "jordanbean",
-                ["monthOfYear"] = DateTime.Now.Month.ToString(),
+                ["current date"] = DateTime.Now.ToString("MM-dd-yyyy"),
                 ["message"] = request.Message
             };
 
