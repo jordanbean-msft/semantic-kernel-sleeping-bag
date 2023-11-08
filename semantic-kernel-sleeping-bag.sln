@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderHistory", "src\OrderHi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductCatalog", "src\ProductCatalog\ProductCatalog.csproj", "{9E82AE12-B936-4036-8E35-D08036512C7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recommendation", "src\Recommendation\Recommendation.csproj", "{96042EFD-C379-4AA7-A303-42DBD7B94C30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecommendationApi", "src\RecommendationApi\RecommendationApi.csproj", "{96042EFD-C379-4AA7-A303-42DBD7B94C30}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "recommendation-web-app", "src\recommendation-web-app\recommendation-web-app.esproj", "{961DE240-E691-42CF-A2D7-1710CC8E31DF}"
 EndProject
@@ -27,14 +27,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{A2211EED-DE15-490C-BF10-6DB139A7957B}"
 	ProjectSection(SolutionItems) = preProject
 		infra\abbreviations.json = infra\abbreviations.json
-		infra\cognitive-services.bicep = infra\cognitive-services.bicep
-		infra\container-app.bicep = infra\container-app.bicep
-		infra\logging.bicep = infra\logging.bicep
-		infra\container-app-environment.bicep = infra\container-app-environment.bicep
-		infra\container-registry.bicep = infra\container-registry.bicep
 		infra\main.bicep = infra\main.bicep
 		infra\main.parameters.json = infra\main.parameters.json
-		infra\resource-names.bicep = infra\resource-names.bicep
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitTVShows", "src\HitTVShows\HitTVShows.csproj", "{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}"

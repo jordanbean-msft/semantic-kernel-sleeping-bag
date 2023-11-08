@@ -44,14 +44,14 @@ param keyVaultResourceGroupName string = resourceGroup().name
 // @description('The Form Recognizer endpoint')
 // param formRecognizerEndpoint string
 
-// @description('The OpenAI endpoint')
-// param openAiEndpoint string
+@description('The OpenAI endpoint')
+param openAiEndpoint string
 
-// @description('The OpenAI ChatGPT deployment name')
-// param openAiChatGptDeployment string
+@description('The OpenAI ChatGPT deployment name')
+param openAiChatGptDeployment string
 
-// @description('The OpenAI Embedding deployment name')
-// param openAiEmbeddingDeployment string
+@description('The OpenAI Embedding deployment name')
+param openAiEmbeddingDeployment string
 
 @description('An array of service binds')
 param serviceBinds array
@@ -76,14 +76,39 @@ module app '../core/host/container-app-upsert.bicep' = {
   params: {
     name: name
     location: location
-    tags: union(tags, { 'azd-service-name': serviceName })
+    tags: union(tags, { 'azd-service-name': 'recommendation-api' })
     identityName: webIdentity.name
     imageName: imageName
     exists: exists
     serviceBinds: serviceBinds
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
-    env: []
+    env: [
+      {
+        name: 'OpenAI__Endpoint'
+        value: openAiEndpoint
+      }
+      {
+        name: 'OpenAI__Key'
+        value: ''
+      }
+      {
+        name: 'OpenAI__ChatModelName'
+        value: openAiChatGptDeployment
+      }
+      {
+        name: 'OpenAI__EmbeddingModelName'
+        value: openAiEmbeddingDeployment
+      }
+      {
+        name: 'ApplicationInsights__ConnectionString'
+        value: applicationInsights.properties.ConnectionString
+      }
+      {
+        name: 'EntraID__TenantId'
+        value: subscription().tenantId
+      }
+    ]
     targetPort: 443
   }
 }

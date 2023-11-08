@@ -3,7 +3,7 @@ using Microsoft.SemanticKernel;
 using System.ComponentModel;
 using System.Text.Json;
 
-namespace Recommendation.Plugins
+namespace RecommendationApi.Plugins
 {
     public class HitTVShowsPlugin
     {

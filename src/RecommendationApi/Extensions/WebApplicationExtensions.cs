@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Recommendation.Services;
+using RecommendationApi.Services;
 
-namespace Recommendation.Extensions
+namespace RecommendationApi.Extensions
 {
     internal static class WebApplicationExtensions
     {

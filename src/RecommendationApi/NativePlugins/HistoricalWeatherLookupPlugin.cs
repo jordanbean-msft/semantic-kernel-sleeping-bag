@@ -2,7 +2,7 @@
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
 
-namespace Recommendation.Plugins
+namespace RecommendationApi.Plugins
 {
     public class HistoricalWeatherLookupPlugin
     {

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging.ApplicationInsights;
-using Recommendation.Extensions;
+using RecommendationApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

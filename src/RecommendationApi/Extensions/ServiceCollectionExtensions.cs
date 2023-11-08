@@ -1,9 +1,8 @@
-﻿using Azure;
-using Azure.AI.OpenAI;
+﻿using Azure.AI.OpenAI;
 using Azure.Identity;
-using Recommendation.Services;
+using RecommendationApi.Services;
 
-namespace Recommendation.Extensions
+namespace RecommendationApi.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
@@ -24,11 +23,11 @@ namespace Recommendation.Extensions
 
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                var key = config["OpenAI:Key"];
+                //var key = config["OpenAI:Key"];
 
-                ArgumentNullException.ThrowIfNull(key, "OpenAI:Key is required");
+                //ArgumentNullException.ThrowIfNull(key, "OpenAI:Key is required");
 
-                var openAIClient = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));//_defaultAzureCredential);
+                var openAIClient = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
 
                 return openAIClient;
             });

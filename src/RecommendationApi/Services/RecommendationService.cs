@@ -1,12 +1,13 @@
 ﻿using Azure.AI.OpenAI;
+using Azure.Identity;
 using Dapr.Client;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Planners;
-using Recommendation.Plugins;
+using RecommendationApi.Plugins;
 using System.Text.Json;
 
-namespace Recommendation.Services
+namespace RecommendationApi.Services
 {
     public class RecommendationService
     {
@@ -25,7 +26,7 @@ namespace Recommendation.Services
 
             ArgumentNullException.ThrowIfNull(deployedModelName, "OpenAI:ChatModelName is required");
 
-            var kernelBuilder = Kernel.Builder.WithAzureChatCompletionService(deployedModelName, client);
+            var kernelBuilder = new KernelBuilder().WithAzureChatCompletionService(deployedModelName, client);
             var embeddingModelName = _configuration["OpenAI:EmbeddingModelName"];
 
             if (!string.IsNullOrWhiteSpace(embeddingModelName))
@@ -33,10 +34,13 @@ namespace Recommendation.Services
                 var endpoint = configuration["OpenAI:Endpoint"];
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                var key = configuration["OpenAI:Key"];
-                ArgumentNullException.ThrowIfNull(key, "OpenAI:Key is required");
+                //var key = configuration["OpenAI:Key"];
+                //ArgumentNullException.ThrowIfNull(key, "OpenAI:Key is required");
 
-                kernelBuilder = kernelBuilder.WithAzureTextEmbeddingGenerationService(embeddingModelName, endpoint, key);
+                kernelBuilder = kernelBuilder.WithAzureTextEmbeddingGenerationService(embeddingModelName, endpoint, new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    TenantId = configuration["EntraID:TenantId"]
+                }));
             }
 
             _kernel = kernelBuilder.WithLoggerFactory(loggerFactory).Build();
@@ -53,18 +57,13 @@ namespace Recommendation.Services
             _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
             _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
             //_kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins", "RecommendationPlugin");
-            //_kernel.CreateSemanticFunction(
-            //    "Generate an answer for the following question: {{$input}}",
-            //    functionName: "GetAnswerForQuestion",
-            //    pluginName: "AnswerBot",
-            //    description: "Given a question, get an answer and return it as the result of the function");
         }
 
         public async Task<Response> ResponseAsync(Request request)
         {
             var contextVariables = new ContextVariables
             {
-                ["username"] = "jordanbean",
+                ["username"] = "dkschrute",
                 ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
                 ["message"] = request.Message
             };

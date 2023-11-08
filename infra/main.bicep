@@ -258,9 +258,9 @@ module api './app/recommendation-api.bicep' = {
     //searchServiceEndpoint: searchService.outputs.endpoint
     //searchIndexName: searchIndexName
     //formRecognizerEndpoint: formRecognizer.outputs.endpoint
-    //openAiEndpoint: openAi.outputs.endpoint
-    //openAiChatGptDeployment: chatGptDeploymentName
-    //openAiEmbeddingDeployment: embeddingDeploymentName
+    openAiEndpoint: openAi.outputs.endpoint
+    openAiChatGptDeployment: chatGptDeploymentName
+    openAiEmbeddingDeployment: embeddingDeploymentName
     serviceBinds: []
   }
 }
@@ -434,6 +434,189 @@ module monitoring './core/monitor/monitoring.bicep' = {
     logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
     applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
     applicationInsightsDashboardName: !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}'
+  }
+}
+
+// USER ROLES
+module openAiRoleUser 'core/security/role.bicep' = {
+  scope: openAiResourceGroup
+  name: 'openai-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+    principalType: principalType
+  }
+}
+
+module formRecognizerRoleUser 'core/security/role.bicep' = {
+  scope: formRecognizerResourceGroup
+  name: 'formrecognizer-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: 'a97b65f3-24c7-4388-baec-2e87135dc908'
+    principalType: principalType
+  }
+}
+
+module storageRoleUser 'core/security/role.bicep' = {
+  scope: storageResourceGroup
+  name: 'storage-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+    principalType: principalType
+  }
+}
+
+module storageContribRoleUser 'core/security/role.bicep' = {
+  scope: storageResourceGroup
+  name: 'storage-contribrole-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+    principalType: principalType
+  }
+}
+
+module searchRoleUser 'core/security/role.bicep' = {
+  scope: searchServiceResourceGroup
+  name: 'search-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
+    principalType: principalType
+  }
+}
+
+module searchContribRoleUser 'core/security/role.bicep' = {
+  scope: searchServiceResourceGroup
+  name: 'search-contrib-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
+    principalType: principalType
+  }
+}
+
+module searchSvcContribRoleUser 'core/security/role.bicep' = {
+  scope: searchServiceResourceGroup
+  name: 'search-svccontrib-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
+    principalType: principalType
+  }
+}
+
+// FUNCTION ROLES
+// module openAiRoleFunction 'core/security/role.bicep' = {
+//   scope: openAiResourceGroup
+//   name: 'openai-role-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// module formRecognizerRoleFunction 'core/security/role.bicep' = {
+//   scope: formRecognizerResourceGroup
+//   name: 'formrecognizer-role-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: 'a97b65f3-24c7-4388-baec-2e87135dc908'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// module storageRoleFunction 'core/security/role.bicep' = {
+//   scope: storageResourceGroup
+//   name: 'storage-role-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// module storageContribRoleFunction 'core/security/role.bicep' = {
+//   scope: storageResourceGroup
+//   name: 'storage-contribrole-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// module searchRoleFunction 'core/security/role.bicep' = {
+//   scope: searchServiceResourceGroup
+//   name: 'search-role-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// module searchContribRoleFunction 'core/security/role.bicep' = {
+//   scope: searchServiceResourceGroup
+//   name: 'search-contrib-role-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// module searchSvcContribRoleFunction 'core/security/role.bicep' = {
+//   scope: searchServiceResourceGroup
+//   name: 'search-svccontrib-role-function'
+//   params: {
+//     principalId: function.outputs.SERVICE_FUNCTION_IDENTITY_PRINCIPAL_ID
+//     roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// SYSTEM IDENTITIES
+module openAiRoleBackend 'core/security/role.bicep' = {
+  scope: openAiResourceGroup
+  name: 'openai-role-backend'
+  params: {
+    principalId: api.outputs.SERVICE_WEB_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module storageRoleBackend 'core/security/role.bicep' = {
+  scope: storageResourceGroup
+  name: 'storage-role-backend'
+  params: {
+    principalId: api.outputs.SERVICE_WEB_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module storageContribRoleBackend 'core/security/role.bicep' = {
+  scope: storageResourceGroup
+  name: 'storage-contribrole-backend'
+  params: {
+    principalId: api.outputs.SERVICE_WEB_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module searchRoleBackend 'core/security/role.bicep' = {
+  scope: searchServiceResourceGroup
+  name: 'search-role-backend'
+  params: {
+    principalId: api.outputs.SERVICE_WEB_IDENTITY_PRINCIPAL_ID
+    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
+    principalType: 'ServicePrincipal'
   }
 }
 
