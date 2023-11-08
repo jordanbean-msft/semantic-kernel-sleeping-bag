@@ -1,7 +1,6 @@
 ﻿using Dapr.Client;
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
-using System.Text.Json;
 
 namespace Recommendation.Plugins
 {
@@ -22,7 +21,14 @@ namespace Recommendation.Plugins
             var httpRequest = _daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={latitude}&longitude={longitude}&monthOfYear={monthOfYear}");
             HttpResponseMessage result = await _daprClient.InvokeMethodWithResponseAsync(httpRequest);
 
-            return JsonSerializer.Serialize(result.Content.ReadAsStringAsync());
+            if (result.IsSuccessStatusCode)
+            {
+                return await result.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                return result.ReasonPhrase;
+            }
         }
     }
 }

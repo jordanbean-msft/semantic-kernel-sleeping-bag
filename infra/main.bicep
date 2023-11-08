@@ -11,8 +11,6 @@ param location string
 
 param resourceGroupName string = ''
 
-@description('Id of the user or app to assign application roles')
-
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
