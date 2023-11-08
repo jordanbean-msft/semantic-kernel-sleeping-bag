@@ -23,4 +23,10 @@
 tye run
 ```
 
+## Deploy to Azure
+
+```shell
+azd up
+```
+
 ## Links

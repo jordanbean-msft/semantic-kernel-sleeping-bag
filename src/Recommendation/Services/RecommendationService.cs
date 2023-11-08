@@ -53,6 +53,11 @@ namespace Recommendation.Services
             _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
             _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
             //_kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins", "RecommendationPlugin");
+            //_kernel.CreateSemanticFunction(
+            //    "Generate an answer for the following question: {{$input}}",
+            //    functionName: "GetAnswerForQuestion",
+            //    pluginName: "AnswerBot",
+            //    description: "Given a question, get an answer and return it as the result of the function");
         }
 
         public async Task<Response> ResponseAsync(Request request)
@@ -66,7 +71,10 @@ namespace Recommendation.Services
 
             var context = _kernel.CreateNewContext(contextVariables);
 
-            var planner = new StepwisePlanner(_kernel);
+            var planner = new StepwisePlanner(_kernel, new StepwisePlannerConfig
+            {
+                MaxIterations = 20
+            });
 
             var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
 
