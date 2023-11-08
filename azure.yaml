@@ -38,8 +38,5 @@ services:
   recommendation-web-app:
     project: ./src/recommendation-web-app/
     host: containerapp
-    language: node
-    docker:
-      path: ./src/recommendation-web-app/Dockerfile
-      context: ./src/recommendation-web-app
+    language: js
 

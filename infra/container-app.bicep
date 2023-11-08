@@ -50,7 +50,7 @@ resource containerAppVehicleRegistrationService 'Microsoft.App/containerApps@202
           image: '${containerRegistry.properties.loginServer}/${containerAppImageTag}'
           resources: {
             cpu: 1
-            memory: '256Mi'
+            memory: '2.0Gi'
           }
           probes: [
             {
