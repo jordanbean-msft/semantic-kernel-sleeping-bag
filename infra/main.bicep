@@ -79,9 +79,33 @@ module cognitiveServicesDeployment 'cognitive-services.bicep' = {
   name: 'cognitive-services-deployment'
   params: {
 	cognitiveServicesAccountName: names.outputs.cognitiveServicesAccountName
-    cognitiveServicesAccountOpenAiName: names.outputs.cognitiveServicesAcccountOpenAiName
     location: location
 	tags: tags
+    deployments: [
+      {
+        name: 'chat'
+        model: {
+          format: 'OpenAI'
+          name: 'gpt-35-turbo'
+          version: '0613'
+        }
+        sku: {
+          name: 'Standard'
+          capacity: 30
+        }
+      }
+      {
+        name: 'embedding'
+        model: {
+          format: 'OpenAI'
+          name: 'text-embedding-ada-002'
+          version: '2'
+        }
+        sku: {
+          name: 'Standard'
+          capacity: 30
+        }
+      }]
   }
 }
 

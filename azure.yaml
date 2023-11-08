@@ -1,2 +1,45 @@
 name: semantic-kernel-sleeping-bag 
 services:
+  historical-weather-service:
+    project: ./src/HistoricalWeatherLookup/
+    host: containerapp
+    language: dotnet
+    docker:
+      path: ./src/HistoricalWeatherLookup/Dockerfile
+      context: ./src/HistoricalWeatherLookup
+  location-lookup:
+    project: ./src/LocationLookup/
+    host: containerapp
+    language: dotnet
+    docker:
+      path: ./src/LocationLookup/Dockerfile
+      context: ./src/LocationLookup
+  order-history:
+    project: ./src/OrderHistory/
+    host: containerapp
+    language: dotnet
+    docker:
+      path: ./src/OrderHistory/Dockerfile
+      context: ./src/OrderHistory
+  product-catalog:
+    project: ./src/ProductCatalog/
+    host: containerapp
+    language: dotnet
+    docker:
+      path: ./src/ProductCatalog/Dockerfile
+      context: ./src/ProductCatalog
+  recommendation-api:
+    project: ./src/Recommendation/
+    host: containerapp
+    language: dotnet
+    docker:
+      path: ./src/Recommendation/Dockerfile
+      context: ./src/Recommendation
+  recommendation-web-app:
+    project: ./src/recommendation-web-app/
+    host: containerapp
+    language: node
+    docker:
+      path: ./src/recommendation-web-app/Dockerfile
+      context: ./src/recommendation-web-app
+
