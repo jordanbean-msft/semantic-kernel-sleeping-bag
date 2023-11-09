@@ -14,7 +14,7 @@
 - [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
 - [Docker](https://docs.docker.com/get-docker/)
 - [Dapr](https://dapr.io/)
-- [Node](https://nodejs.org/en/)
+- [Node.js with npm](https://nodejs.org/en/)
 
 ## Deployment
 
