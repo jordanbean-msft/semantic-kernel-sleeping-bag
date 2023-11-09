@@ -110,6 +110,10 @@ module app '../core/host/container-app-upsert.bicep' = {
         name: 'Cors__AllowedOrigins'
         value: corsOrigin
       }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: webIdentity.properties.clientId
+      }
     ]
     targetPort: 8080
     external: true

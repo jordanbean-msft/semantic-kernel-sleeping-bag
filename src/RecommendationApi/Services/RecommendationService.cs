@@ -34,9 +34,6 @@ namespace RecommendationApi.Services
                 var endpoint = configuration["OpenAI:Endpoint"];
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                //var key = configuration["OpenAI:Key"];
-                //ArgumentNullException.ThrowIfNull(key, "OpenAI:Key is required");
-
                 kernelBuilder = kernelBuilder.WithAzureTextEmbeddingGenerationService(embeddingModelName, endpoint, new DefaultAzureCredential(new DefaultAzureCredentialOptions
                 {
                     TenantId = configuration["EntraID:TenantId"]
@@ -51,12 +48,9 @@ namespace RecommendationApi.Services
         private void RegisterPlugins()
         {
             _kernel.ImportFunctions(new HistoricalWeatherLookupPlugin(_daprClient), "HistoricalWeatherLookupPlugin");
-            //_kernel.ImportFunctions(new HitMoviesPlugin(_daprClient), "HitMoviesPlugin");
             _kernel.ImportFunctions(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
-            //_kernel.ImportFunctions(new HitTVShowsPlugin(_daprClient), "HitTVShowsPlugin");
             _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
             _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
-            //_kernel.ImportSemanticFunctionsFromDirectory("SemanticPlugins", "RecommendationPlugin");
         }
 
         public async Task<Response> ResponseAsync(Request request)
