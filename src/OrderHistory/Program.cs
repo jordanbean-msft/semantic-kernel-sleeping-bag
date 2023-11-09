@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -52,6 +53,8 @@ app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory>, NotFound<string
 })
 .WithName("GetOrderHistory")
 .WithOpenApi();
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
 

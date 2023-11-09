@@ -84,7 +84,7 @@ module app '../core/host/container-app-upsert.bicep' = {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
     env: []
-    targetPort: 443
+    targetPort: 80
   }
 }
 

@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -36,6 +37,8 @@ app.MapGet("/location", Results<Ok<LatLong>, NotFound<string>> (string nameOfLoc
 })
 .WithName("GetLocation")
 .WithOpenApi();
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
 

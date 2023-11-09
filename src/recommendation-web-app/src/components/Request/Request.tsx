@@ -1,24 +1,17 @@
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import Response from "../Response/Response";
-import * as React from 'react';
+import Response, { ResponseMessage, OpenAIMessage } from "../Response/Response";
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import './Request.css'
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
-import { styled } from '@mui/material/styles';
 import { green } from '@mui/material/colors';
-import Fab from '@mui/material/Fab';
-import CheckIcon from '@mui/icons-material/Check';
-import SaveIcon from '@mui/icons-material/Save';
 
 export default function Request() {
     const [request, setRequest] = useState("Will my sleeping bag work for my trip to Patagonia next month?");
-    const [response, setResponse] = useState("");
+    const [response, setResponse] = useState<ResponseMessage>();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
@@ -35,7 +28,7 @@ export default function Request() {
 
     return (
         <Stack>
-            <Paper class="requestPaper">
+            <Paper className="requestPaper">
                 <TextField
                     id="request"
                     label="Request"
@@ -78,7 +71,7 @@ export default function Request() {
         if (!loading) {
             setSuccess(false);
             setLoading(true);
-            setResponse("");
+            setResponse(undefined);
             //e.preventDefault();
             const response = await fetch(`${process.env.REACT_APP_RECOMMENDATION_API_URL}/recommendation`, {
                 method: "POST",

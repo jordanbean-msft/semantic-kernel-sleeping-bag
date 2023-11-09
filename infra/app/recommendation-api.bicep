@@ -56,6 +56,8 @@ param openAiEmbeddingDeployment string
 @description('An array of service binds')
 param serviceBinds array
 
+param corsOrigin string = ''
+
 resource webIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: identityName
   location: location
@@ -89,10 +91,6 @@ module app '../core/host/container-app-upsert.bicep' = {
         value: openAiEndpoint
       }
       {
-        name: 'OpenAI__Key'
-        value: ''
-      }
-      {
         name: 'OpenAI__ChatModelName'
         value: openAiChatGptDeployment
       }
@@ -108,8 +106,16 @@ module app '../core/host/container-app-upsert.bicep' = {
         name: 'EntraID__TenantId'
         value: subscription().tenantId
       }
+      {
+        name: 'Cors__AllowedOrigins'
+        value: corsOrigin
+      }
     ]
-    targetPort: 443
+    targetPort: 80
+    external: true
+    daprEnabled: true
+    daprAppId: 'recommendation-api'
+    daprAppProtocol: 'http'
   }
 }
 

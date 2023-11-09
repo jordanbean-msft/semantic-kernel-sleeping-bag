@@ -262,6 +262,7 @@ module api './app/recommendation-api.bicep' = {
     openAiChatGptDeployment: chatGptDeploymentName
     openAiEmbeddingDeployment: embeddingDeploymentName
     serviceBinds: []
+    corsOrigin: web.outputs.SERVICE_WEB_URI
   }
 }
 

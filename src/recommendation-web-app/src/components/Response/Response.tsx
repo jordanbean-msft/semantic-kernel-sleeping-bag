@@ -14,7 +14,19 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-export default function Response({ response }) {
+export interface OpenAIMessage {
+    action: string;
+    final_answer: string;
+    thought: string;
+    original_response: string;
+    observation: string;
+}
+
+export interface ResponseMessage {
+     openAIMessages: Array<OpenAIMessage>;
+}
+
+export default function Response({response}: {response: ResponseMessage} ) {
     return (<TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
             <TableHead>
@@ -23,7 +35,7 @@ export default function Response({ response }) {
                 <TableCell>Final Answer</TableCell>
             </TableHead>
             <TableBody>
-                {response?.openAIMessages?.map((row) => (
+                {response?.openAIMessages?.map((row: { action: React.Key | null | undefined; }) => (
                     <Row key={row.action} row={row} />
                 ))
                 }
@@ -33,7 +45,7 @@ export default function Response({ response }) {
     );
 }
 
-function Row(props: { row: ReturnType<typeof createData> }) {
+function Row(props: { row: any; }) {
     const { row } = props;
     const [open, setOpen] = React.useState(false);
 
