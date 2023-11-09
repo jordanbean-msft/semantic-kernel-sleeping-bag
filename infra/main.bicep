@@ -15,22 +15,22 @@ param tags string = ''
 //      "value": "myGroupName"
 // }
 param historicalWeatherLookupContainerAppName string = ''
-param historicalWeatherLookupImageName string = ''
+//param historicalWeatherLookupImageName string = ''
 param historicalWeatherLookupIdentityName string = ''
 param locationLookupContainerAppName string = ''
-param locationLookupImageName string = ''
+//param locationLookupImageName string = ''
 param locationLookupIdentityName string = ''
 param orderHistoryContainerAppName string = ''
-param orderHistoryImageName string = ''
+//param orderHistoryImageName string = ''
 param orderHistoryIdentityName string = ''
 param productCatalogContainerAppName string = ''
-param productCatalogImageName string = ''
+//param productCatalogImageName string = ''
 param productCatalogIdentityName string = ''
 param recommendationApiContainerAppName string = ''
-param recommendationApiImageName string = ''
+//param recommendationApiImageName string = ''
 param recommendationApiIdentityName string = ''
 param recommendationWebAppContainerAppName string = ''
-param recommendationWebAppImageName string = ''
+//param recommendationWebAppImageName string = ''
 param recommendationWebAppIdentityName string = ''
 param historicalWeatherLookupAppExists bool = false
 param locationLookupAppExists bool = false
@@ -217,7 +217,7 @@ module web './app/recommendation-web-app.bicep' = {
     name: !empty(recommendationWebAppContainerAppName) ? recommendationWebAppContainerAppName : '${abbrs.appContainerApps}web-app-${resourceToken}'
     location: location
     tags: updatedTags
-    imageName: recommendationWebAppImageName
+    //imageName: recommendationWebAppImageName
     identityName: !empty(recommendationWebAppIdentityName) ? recommendationWebAppIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}web-app-${resourceToken}'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
@@ -234,6 +234,7 @@ module web './app/recommendation-web-app.bicep' = {
     //openAiChatGptDeployment: chatGptDeploymentName
     //openAiEmbeddingDeployment: embeddingDeploymentName
     serviceBinds: []
+    apiBaseUrl: !empty(webApiBaseUrl) ? webApiBaseUrl : api.outputs.SERVICE_API_URI
   }
 }
 
@@ -245,7 +246,7 @@ module api './app/recommendation-api.bicep' = {
     name: !empty(recommendationApiContainerAppName) ? recommendationApiContainerAppName : '${abbrs.appContainerApps}api-${resourceToken}'
     location: location
     tags: updatedTags
-    imageName: recommendationApiImageName
+    //imageName: recommendationApiImageName
     identityName: !empty(recommendationApiIdentityName) ? recommendationApiIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}api-${resourceToken}'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
@@ -262,7 +263,7 @@ module api './app/recommendation-api.bicep' = {
     openAiChatGptDeployment: chatGptDeploymentName
     openAiEmbeddingDeployment: embeddingDeploymentName
     serviceBinds: []
-    corsOrigin: web.outputs.SERVICE_WEB_URI
+    corsOrigin: corsAcaUrl
   }
 }
 
@@ -273,7 +274,7 @@ module historicalWeatherLookupApi './app/historical-weather-lookup.bicep' = {
     name: !empty(historicalWeatherLookupContainerAppName) ? historicalWeatherLookupContainerAppName : '${abbrs.appContainerApps}weather-lookup-${resourceToken}'
     location: location
     tags: updatedTags
-    imageName: historicalWeatherLookupImageName
+    //imageName: historicalWeatherLookupImageName
     identityName: !empty(historicalWeatherLookupIdentityName) ? historicalWeatherLookupIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}weather-lookup-${resourceToken}'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
@@ -300,7 +301,7 @@ module locationLookupApi './app/location-lookup.bicep' = {
     name: !empty(locationLookupContainerAppName) ? locationLookupContainerAppName : '${abbrs.appContainerApps}location-lookup-${resourceToken}'
     location: location
     tags: updatedTags
-    imageName: locationLookupImageName
+    //imageName: locationLookupImageName
     identityName: !empty(locationLookupIdentityName) ? locationLookupIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}location-lookup-${resourceToken}'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
@@ -327,7 +328,7 @@ module orderHistoryApi './app/order-history.bicep' = {
     name: !empty(orderHistoryContainerAppName) ? orderHistoryContainerAppName : '${abbrs.appContainerApps}order-history-${resourceToken}'
     location: location
     tags: updatedTags
-    imageName: orderHistoryImageName
+    //imageName: orderHistoryImageName
     identityName: !empty(orderHistoryIdentityName) ? orderHistoryIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}order-history-${resourceToken}'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName
@@ -354,7 +355,7 @@ module productCatalogApi './app/product-catalog.bicep' = {
     name: !empty(productCatalogContainerAppName) ? productCatalogContainerAppName : '${abbrs.appContainerApps}product-catalog-${resourceToken}'
     location: location
     tags: updatedTags
-    imageName: productCatalogImageName
+    //imageName: productCatalogImageName
     identityName: !empty(productCatalogIdentityName) ? productCatalogIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}product-catalog-${resourceToken}'
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: containerApps.outputs.environmentName

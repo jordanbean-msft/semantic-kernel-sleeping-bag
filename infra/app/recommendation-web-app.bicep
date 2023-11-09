@@ -17,8 +17,8 @@ param containerRegistryName string
 @description('The name of the service')
 param serviceName string = 'web-app'
 
-@description('The name of the image')
-param imageName string = ''
+//@description('The name of the image')
+//param imageName string = ''
 
 @description('Specifies if the resource exists')
 param exists bool
@@ -55,6 +55,7 @@ param keyVaultResourceGroupName string = resourceGroup().name
 
 @description('An array of service binds')
 param serviceBinds array
+param apiBaseUrl string
 
 resource webIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: identityName
@@ -78,13 +79,28 @@ module app '../core/host/container-app-upsert.bicep' = {
     location: location
     tags: union(tags, { 'azd-service-name': 'recommendation-web-app' })
     identityName: webIdentity.name
-    imageName: imageName
+    //imageName: imageName
     exists: exists
     serviceBinds: serviceBinds
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
-    env: []
+    env: [
+      {
+        name: 'REACT_APP_APPLICATIONINSIGHTS_CONNECTION_STRING'
+        value: applicationInsights.properties.ConnectionString
+      }
+      {
+        name: 'REACT_APP_API_BASE_URL'
+        value: apiBaseUrl
+      }
+      {
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        value: applicationInsights.properties.ConnectionString
+      }
+    ]
     targetPort: 80
+    containerCpuCoreCount: '1'
+    containerMemory: '2.0Gi'
   }
 }
 

@@ -17,8 +17,8 @@ param containerRegistryName string
 @description('The name of the service')
 param serviceName string = 'api'
 
-@description('The name of the image')
-param imageName string = ''
+//@description('The name of the image')
+//param imageName string = ''
 
 @description('Specifies if the resource exists')
 param exists bool
@@ -80,7 +80,7 @@ module app '../core/host/container-app-upsert.bicep' = {
     location: location
     tags: union(tags, { 'azd-service-name': 'recommendation-api' })
     identityName: webIdentity.name
-    imageName: imageName
+    //imageName: imageName
     exists: exists
     serviceBinds: serviceBinds
     containerAppsEnvironmentName: containerAppsEnvironmentName
@@ -111,11 +111,13 @@ module app '../core/host/container-app-upsert.bicep' = {
         value: corsOrigin
       }
     ]
-    targetPort: 80
+    targetPort: 8080
     external: true
     daprEnabled: true
     daprAppId: 'recommendation-api'
     daprAppProtocol: 'http'
+    containerCpuCoreCount: '1'
+    containerMemory: '2.0Gi'
   }
 }
 

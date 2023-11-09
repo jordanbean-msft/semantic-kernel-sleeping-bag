@@ -17,8 +17,8 @@ param containerRegistryName string
 @description('The name of the service')
 param serviceName string = 'order-history'
 
-@description('The name of the image')
-param imageName string = ''
+//@description('The name of the image')
+//param imageName string = ''
 
 @description('Specifies if the resource exists')
 param exists bool
@@ -78,17 +78,19 @@ module app '../core/host/container-app-upsert.bicep' = {
     location: location
     tags: union(tags, { 'azd-service-name': serviceName })
     identityName: webIdentity.name
-    imageName: imageName
+    //imageName: imageName
     exists: exists
     serviceBinds: serviceBinds
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
     env: []
-    targetPort: 80
+    targetPort: 8080
     external: false
     daprEnabled: true
     daprAppId: 'order-history'
     daprAppProtocol: 'http'
+    containerCpuCoreCount: '1'
+    containerMemory: '2.0Gi'
   }
 }
 
