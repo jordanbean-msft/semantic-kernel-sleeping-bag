@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -19,11 +22,11 @@ app.UseHttpsRedirection();
 Dictionary<string, OrderHistory> orderHistory = new()
 {
     {
-    "jordanbean",
+    "dkschrute",
     new OrderHistory
     {
             OrderId = "1",
-            CustomerId = "jordanbean",
+            CustomerId = "dkschrute",
             OrderDate = "2021-01-01",
             OrderTotal = "10",
             OrderStatus = "Shipped",
@@ -39,17 +42,19 @@ Dictionary<string, OrderHistory> orderHistory = new()
     }
 };
 
-app.MapGet("/orderHistory/{username}", (string username) =>
+app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory>, NotFound<string>> (string username) =>
 {
     OrderHistory response = null;
     if (orderHistory.TryGetValue(username, out var orderHistoryItem))
     {
         response = orderHistoryItem;
     }
-    return TypedResults.Ok(response);
+    return response != null ? TypedResults.Ok(response) : TypedResults.NotFound($"No order history found for user ${username}");
 })
 .WithName("GetOrderHistory")
 .WithOpenApi();
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
 

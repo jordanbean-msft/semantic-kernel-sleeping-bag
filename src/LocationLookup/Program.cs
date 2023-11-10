@@ -1,4 +1,5 @@
 using LocationLookup;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -27,12 +29,16 @@ Dictionary<string, LatLong> locations = new()
     } }
 };
 
-app.MapGet("/location", (string nameOfLocation) =>
+app.MapGet("/location", Results<Ok<LatLong>, NotFound<string>> (string nameOfLocation) =>
 {
-    return locations[nameOfLocation];
+    LatLong location = null;
+    locations.TryGetValue(nameOfLocation, out location);
+    return location != null ? TypedResults.Ok(location) : TypedResults.NotFound($"No location found for {nameOfLocation}.");
 })
 .WithName("GetLocation")
 .WithOpenApi();
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
 

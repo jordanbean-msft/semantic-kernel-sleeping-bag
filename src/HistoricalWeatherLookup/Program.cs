@@ -1,4 +1,5 @@
 using HistoricalWeatherLookup;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -28,23 +30,22 @@ Dictionary<HistoricalWeatherInput, HistoricalWeather> historicalWeather = new()
         },
         new HistoricalWeather
         {
-            HighestAmbientTemperature = 100,
-            LowestAmbientTemperature = 10
+            HighestExpectedTemperatureInFahrenheit = 100,
+            LowestExpectedTemperatureInFahrenheit = 20
         }
     }
 };
 
-app.MapGet("/historical-weather-lookup", (double latitude, double longitude, int monthOfYear) =>
+app.MapGet("/historical-weather-lookup", Results<Ok<HistoricalWeather>, NotFound<string>> (double latitude, double longitude, int monthOfYear) =>
 {
     HistoricalWeather historicalWeatherResponse = null;
-    if (historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out var historicalWeatherItem))
-    {
-        historicalWeatherResponse = historicalWeatherItem;
-    }
+    historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out historicalWeatherResponse);
 
-    return TypedResults.Ok(historicalWeatherResponse);
+    return historicalWeatherResponse != null ? TypedResults.Ok(historicalWeatherResponse) : TypedResults.NotFound($"No historical weather found for latitude ${latitude}, longitude ${longitude} & monthOfYear ${monthOfYear}.");
 })
 .WithName("GetHistoricalWeather")
 .WithOpenApi();
+
+app.MapHealthChecks("/healthz");
 
 app.Run();

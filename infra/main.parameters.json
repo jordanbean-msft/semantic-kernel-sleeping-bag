@@ -7,6 +7,105 @@
     },
     "location": {
       "value": "${AZURE_LOCATION}"
+    },
+    "tags": {
+      "value": "${AZURE_TAGS}"
+    },
+    "formRecognizerResourceGroupName": {
+      "value": "${AZURE_FORMRECOGNIZER_RESOURCE_GROUP}"
+    },
+    "formRecognizerServiceName": {
+      "value": "${AZURE_FORMRECOGNIZER_SERVICE}"
+    },
+    "formRecognizerSkuName": {
+      "value": "S0"
+    },
+    "keyVaultName": {
+      "value": "${AZURE_KEY_VAULT_NAME}"
+    },
+    "keyVaultResourceGroupName": {
+      "value": "${AZURE_KEY_VAULT_RESOURCE_GROUP}"
+    },
+    "openAiResourceGroupName": {
+      "value": "${AZURE_OPENAI_RESOURCE_GROUP}"
+    },
+    "openAiResourceGroupLocation": {
+      "value": "${AZURE_OPENAI_RESOURCE_LOCATION=${AZURE_LOCATION}}"
+    },
+    "chatGptDeploymentName": {
+      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT=chat}"
+    },
+    "embeddingDeploymentName": {
+      "value": "${AZURE_OPENAI_EMBEDDING_DEPLOYMENT=embedding}"
+    },
+    "openAiServiceName": {
+      "value": "${AZURE_OPENAI_SERVICE}"
+    },
+    "openAiSkuName": {
+      "value": "S0"
+    },
+    "principalId": {
+      "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "principalType": {
+      "value": "${AZURE_PRINCIPAL_TYPE=User}"
+    },
+    "resourceGroupName": {
+      "value": "${AZURE_RESOURCE_GROUP}"
+    },
+    "searchServiceName": {
+      "value": "${AZURE_SEARCH_SERVICE}"
+    },
+    "searchServiceResourceGroupName": {
+      "value": "${AZURE_SEARCH_SERVICE_RESOURCE_GROUP}"
+    },
+    "searchServiceSkuName": {
+      "value": "standard"
+    },
+    "storageAccountName": {
+      "value": "${AZURE_STORAGE_ACCOUNT}"
+    },
+    "storageResourceGroupName": {
+      "value": "${AZURE_STORAGE_RESOURCE_GROUP}"
+    },
+    "recommendationWebAppExists": {
+      "value": "${SERVICE_RECOMMENDATION_WEB_APP_RESOURCE_EXISTS=false}"
+    },
+    "recommendationWebAppIdentityName": {
+      "value": "${SERVICE_RECOMMENDATION_WEB_APP_IDENTITY_NAME}"
+    },
+    "recommendationApiAppExists": {
+      "value": "${SERVICE_RECOMMENDATION_API_APP_RESOURCE_EXISTS=false}"
+    },
+    "recommendationApiAppIdentityName": {
+      "value": "${SERVICE_RECOMMENDATION_API_APP_IDENTITY_NAME}"
+    },
+    "historicalWeatherLookupAppExists": {
+      "value": "${SERVICE_HISTORICAL_WEATHER_LOOKUP_APP_RESOURCE_EXISTS=false}"
+    },
+    "historicalWeatherLookupAppIdentityName": {
+      "value": "${SERVICE_HISTORICAL_WEATHER_LOOKUP_IDENTITY_NAME}"
+    },
+    "locationLookupAppExists": {
+      "value": "${SERVICE_LOCATION_LOOKUP_APP_RESOURCE_EXISTS=false}"
+    },
+    "locationLookupAppIdentityName": {
+      "value": "${SERVICE_LOCATION_LOOKUP_IDENTITY_NAME}"
+    },
+    "orderHistoryAppExists": {
+      "value": "${SERVICE_ORDER_HISTORY_APP_RESOURCE_EXISTS=false}"
+    },
+    "orderHistoryAppIdentityName": {
+      "value": "${SERVICE_ORDER_HISTORY_IDENTITY_NAME}"
+    },
+    "productCatalogAppExists": {
+      "value": "${SERVICE_PRODUCT_CATALOG_APP_RESOURCE_EXISTS=false}"
+    },
+    "productCatalogAppIdentityName": {
+      "value": "${SERVICE_PRODUCT_CATALOG_IDENTITY_NAME}"
+    },
+    "useApplicationInsights": {
+      "value": "${AZURE_USE_APPLICATION_INSIGHTS=true}"
     }
   }
 }

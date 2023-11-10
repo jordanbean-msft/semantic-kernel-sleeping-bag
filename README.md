@@ -14,6 +14,7 @@
 - [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
 - [Docker](https://docs.docker.com/get-docker/)
 - [Dapr](https://dapr.io/)
+- [Node.js with npm](https://nodejs.org/en/)
 
 ## Deployment
 
@@ -21,6 +22,12 @@
 
 ```shell
 tye run
+```
+
+## Deploy to Azure
+
+```shell
+azd up
 ```
 
 ## Links
