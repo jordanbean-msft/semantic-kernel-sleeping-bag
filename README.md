@@ -9,6 +9,7 @@
 ## Prerequisites
 
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview)
 - Azure subscription & resource group
 - [Tye](https://github.com/dotnet/tye)
 - [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
