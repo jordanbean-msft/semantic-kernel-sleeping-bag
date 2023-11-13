@@ -14,7 +14,8 @@ namespace RecommendationApi.Plugins
         }
 
         [SKFunction, Description("Returns historical sports scores")]
-        public async Task<string> HistoricalSportsScores()
+        public async Task<string> HistoricalSportsScoresAsync(ILogger logger,
+            CancellationToken cancellationToken)
         {
             var result = await _daprClient.InvokeMethodAsync<LatLong>(HttpMethod.Get, "historical-sports-scores-lookup", "historicalSportsScores");
 
