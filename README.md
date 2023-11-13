@@ -62,16 +62,10 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
 
 ## Deploy to Azure
 
-1.  Run the following command to deploy all services to Azure.
+1.  Run the following command to deploy all services to Azure (building Docker containers, deploying Azure infrastructure & deploying web apps takes about 30 minutes).
 
     ```shell
     azd up
     ```
-
-## Deploy to Azure
-
-```shell
-azd up
-```
 
 ## Links
