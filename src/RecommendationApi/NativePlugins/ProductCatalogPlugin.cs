@@ -13,7 +13,7 @@ namespace RecommendationApi.Plugins
         }
 
         [SKFunction, Description("Get the product specifications. This includes data such as length, highest & lowest supported temperature in Fahrenheit")]
-        public async Task<string> ProductCatalogItemLookup([Description("The string product ID of the product")] string productId)
+        public async Task<string> ProductCatalogItemLookup([Description("The string product ID of the product. This should be a string, not JSON.")] string productId)
         {
             var httpRequest = _daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "product-catalog", $"productCatalog/{productId}");
             HttpResponseMessage result = await _daprClient.InvokeMethodWithResponseAsync(httpRequest);

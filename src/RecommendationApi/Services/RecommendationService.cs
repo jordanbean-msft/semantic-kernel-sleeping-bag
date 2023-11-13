@@ -69,7 +69,7 @@ namespace RecommendationApi.Services
                 MaxIterations = 20
             });
 
-            var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Use the plugins that are registered to help you answer the question.");
+            var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
 
             var response = await plan.InvokeAsync(context);
 
