@@ -24,13 +24,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		tye.yaml = tye.yaml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{A2211EED-DE15-490C-BF10-6DB139A7957B}"
-	ProjectSection(SolutionItems) = preProject
-		infra\abbreviations.json = infra\abbreviations.json
-		infra\main.bicep = infra\main.bicep
-		infra\main.parameters.json = infra\main.parameters.json
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitTVShows", "src\HitTVShows\HitTVShows.csproj", "{DA6F51C6-86E2-4DEA-9EA7-C33AA449504B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HitMovies", "src\HitMovies\HitMovies.csproj", "{67BADDB6-9EF1-412B-88DF-57D671D715B0}"
@@ -78,9 +71,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A2211EED-DE15-490C-BF10-6DB139A7957B} = {D44DC587-49AB-41D5-A698-1D8A2EE714E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F5CA88FE-8981-4DEA-91F3-2569C3E433CE}

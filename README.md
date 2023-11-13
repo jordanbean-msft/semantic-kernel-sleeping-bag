@@ -60,6 +60,11 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
     tye run
     ```
 
+1.  Navigate to the following URLs to test the application.
+    
+    - [Web App](http://localhost:3000)
+    - [Tye dashboard (status of services)](http://localhost:8000)
+
 ## Deploy to Azure
 
 1.  Run the following command to deploy all services to Azure (building Docker containers, deploying Azure infrastructure & deploying web apps takes about 30 minutes).

@@ -23,10 +23,6 @@ namespace RecommendationApi.Extensions
 
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                //var key = config["OpenAI:Key"];
-
-                //ArgumentNullException.ThrowIfNull(key, "OpenAI:Key is required");
-
                 var openAIClient = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
 
                 return openAIClient;
