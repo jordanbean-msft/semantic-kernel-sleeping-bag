@@ -122,6 +122,7 @@ module app '../core/host/container-app-upsert.bicep' = {
     daprAppProtocol: 'http'
     containerCpuCoreCount: '1'
     containerMemory: '2.0Gi'
+    allowedOrigins: array(corsOrigin)
   }
 }
 

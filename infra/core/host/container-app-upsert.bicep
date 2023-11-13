@@ -67,6 +67,9 @@ param serviceBinds array = []
 @description('The target port for the container')
 param targetPort int = 80
 
+@description('Allowed origins')
+param allowedOrigins array = []
+
 resource existingApp 'Microsoft.App/containerApps@2023-04-01-preview' existing = if (exists) {
   name: name
 }
@@ -96,6 +99,7 @@ module app 'container-app.bicep' = {
     imageName: !empty(imageName) ? imageName : exists ? existingApp.properties.template.containers[0].image : ''
     targetPort: targetPort
     serviceBinds: serviceBinds
+    allowedOrigins: allowedOrigins
   }
 }
 

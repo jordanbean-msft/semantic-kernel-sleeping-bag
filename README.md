@@ -64,6 +64,7 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
     
     - [Web App](http://localhost:3000)
     - [Tye dashboard (status of services)](http://localhost:8000)
+    - [Zipkin dashboard (view traces)](http://localhost:9411/zipkin)
 
 ## Deploy to Azure
 
