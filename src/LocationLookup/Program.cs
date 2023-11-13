@@ -29,11 +29,11 @@ Dictionary<string, LatLong> locations = new()
     } }
 };
 
-app.MapGet("/location", Results<Ok<LatLong>, NotFound<string>> (string nameOfLocation) =>
+app.MapGet("/location", Results<Ok<LatLong>, NotFound<NotFoundMessage>> (string nameOfLocation) =>
 {
     LatLong location = null;
     locations.TryGetValue(nameOfLocation, out location);
-    return location != null ? TypedResults.Ok(location) : TypedResults.NotFound($"No location found for {nameOfLocation}.");
+    return location != null ? TypedResults.Ok(location) : TypedResults.NotFound(new NotFoundMessage { Message = $"No location found for {nameOfLocation}." });
 })
 .WithName("GetLocation")
 .WithOpenApi();

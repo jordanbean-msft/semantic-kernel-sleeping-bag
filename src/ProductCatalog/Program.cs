@@ -32,12 +32,12 @@ Dictionary<string, ProductCatalogItem> productCatalog = new()
     }
 };
 
-app.MapGet("/productCatalog/{id}", Results<Ok<ProductCatalogItem>, NotFound<string>> (string id) =>
+app.MapGet("/productCatalog/{id}", Results<Ok<ProductCatalogItem>, NotFound<NotFoundMessage>> (string id) =>
 {
     ProductCatalogItem productCatalogItem = null;
     productCatalog.TryGetValue(id, out productCatalogItem);
 
-    return productCatalogItem != null ? TypedResults.Ok(productCatalogItem) : TypedResults.NotFound($"No product catalog item found for id ${id}");
+    return productCatalogItem != null ? TypedResults.Ok(productCatalogItem) : TypedResults.NotFound(new NotFoundMessage { Message = $"No product catalog item found for id {id}" });
 })
 .WithName("GetProductCatalogItem")
 .WithOpenApi();

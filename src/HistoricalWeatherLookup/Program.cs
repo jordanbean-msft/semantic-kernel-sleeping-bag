@@ -31,17 +31,19 @@ Dictionary<HistoricalWeatherInput, HistoricalWeather> historicalWeather = new()
         new HistoricalWeather
         {
             HighestExpectedTemperatureInFahrenheit = 100,
-            LowestExpectedTemperatureInFahrenheit = 20
+            LowestExpectedTemperatureInFahrenheit = 30
         }
     }
 };
 
-app.MapGet("/historical-weather-lookup", Results<Ok<HistoricalWeather>, NotFound<string>> (double latitude, double longitude, int monthOfYear) =>
+app.MapGet("/historical-weather-lookup", Results<Ok<HistoricalWeather>, NotFound<NotFoundMessage>> (double latitude, double longitude, int monthOfYear) =>
 {
     HistoricalWeather historicalWeatherResponse = null;
     historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out historicalWeatherResponse);
 
-    return historicalWeatherResponse != null ? TypedResults.Ok(historicalWeatherResponse) : TypedResults.NotFound($"No historical weather found for latitude ${latitude}, longitude ${longitude} & monthOfYear ${monthOfYear}.");
+    return historicalWeatherResponse != null ? TypedResults.Ok(historicalWeatherResponse) : TypedResults.NotFound(new NotFoundMessage { 
+        Message = $"Not Found: No historical weather found for latitude {latitude}, longitude {longitude} & monthOfYear {monthOfYear}. Make sure this is the correct GPS latitude, longitude & month of the year." 
+    });
 })
 .WithName("GetHistoricalWeather")
 .WithOpenApi();
