@@ -42,14 +42,14 @@ Dictionary<string, OrderHistory> orderHistory = new()
     }
 };
 
-app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory>, NotFound<string>> (string username) =>
+app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory>, NotFound<NotFoundMessage>> (string username) =>
 {
     OrderHistory response = null;
     if (orderHistory.TryGetValue(username, out var orderHistoryItem))
     {
         response = orderHistoryItem;
     }
-    return response != null ? TypedResults.Ok(response) : TypedResults.NotFound($"No order history found for user ${username}");
+    return response != null ? TypedResults.Ok(response) : TypedResults.NotFound(new NotFoundMessage { Message = $"No order history found for user {username}" });
 })
 .WithName("GetOrderHistory")
 .WithOpenApi();

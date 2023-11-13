@@ -20,14 +20,7 @@ namespace RecommendationApi.Plugins
             var httpRequest = _daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "order-history", $"orderHistory/{username}");
             HttpResponseMessage result = await _daprClient.InvokeMethodWithResponseAsync(httpRequest, cancellationToken);
 
-            if (result.IsSuccessStatusCode)
-            {
-                return await result.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                return result.ReasonPhrase;
-            }
+            return await result.Content.ReadAsStringAsync();
         }
     }
 }
