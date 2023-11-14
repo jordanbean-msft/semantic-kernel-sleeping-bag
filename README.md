@@ -15,6 +15,14 @@ In order to do this, the code needs to be able to call several different data so
 
 We need the RecommendationAPI to be able to call all of these APIs and then combine the results into a single answer. Semantic Kernel enables us to orchestrate these API calls via the StepwisePlanner. This planner will make multiple calls to the OpenAI service, make up its own plan to answer the question based upon the data & native plugins it has access to, then execute the plan.
 
+Here is a series of blog posts that go through this demo in detail.
+
+- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 1](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-1/)
+- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 2 (demo app implementation)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-2/)
+- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 3 (demo app)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-3-demo-app/)
+- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 4 (local development & deployment details)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-4-local-development-deployment-details/)
+- [How to dynamically set a runtime config value for a React app in Azure Container Apps](https://jordanbeandev.com/how-to-dynamically-set-a-runtime-config-value-for-a-react-app-in-azure-container-apps/)
+
 ## Disclaimer
 
 **THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.**
@@ -34,6 +42,14 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
 - [Node.js with npm](https://nodejs.org/en/)
 
 ## Deployment
+
+## Deploy to Azure
+
+1.  Run the following command to deploy all services to Azure (building Docker containers, deploying Azure infrastructure & deploying web apps takes about 30 minutes).
+
+    ```shell
+    azd up
+    ```
 
 ## Run locally
 
@@ -69,12 +85,12 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
     - [Tye dashboard (status of services)](http://localhost:8000)
     - [Zipkin dashboard (view traces)](http://localhost:9411/zipkin)
 
-## Deploy to Azure
-
-1.  Run the following command to deploy all services to Azure (building Docker containers, deploying Azure infrastructure & deploying web apps takes about 30 minutes).
-
-    ```shell
-    azd up
-    ```
-
 ## Links
+
+- [Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/overview/)
+- [Stepwise Planner](https://learn.microsoft.com/en-us/semantic-kernel/ai-orchestration/planners/?tabs=Csharp)
+- [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)
+- [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview)
+- [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview)
+- [Tye](https://github.com/dotnet/tye)
+- [Dapr](https://dapr.io/)
