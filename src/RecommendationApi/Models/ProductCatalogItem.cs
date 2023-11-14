@@ -1,6 +1,9 @@
-﻿public record ProductCatalogItem
+﻿namespace RecommendationApi.Models
 {
-    public string ProductId { get; init; }
-    public string ProductName { get; init; }
-    public string ProductDescription { get; init; }
+    public record ProductCatalogItem
+    {
+        public string ProductId { get; init; } = "";
+        public string ProductName { get; init; } = "";
+        public string ProductDescription { get; init; } = "";
+    }
 }

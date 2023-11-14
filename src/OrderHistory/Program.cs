@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using OrderHistory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +20,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-Dictionary<string, OrderHistory> orderHistory = new()
+Dictionary<string, OrderHistory.OrderHistory> orderHistory = new()
 {
     {
     "dkschrute",
-    new OrderHistory
+    new OrderHistory.OrderHistory
     {
             OrderId = "1",
             CustomerId = "dkschrute",
@@ -42,9 +43,9 @@ Dictionary<string, OrderHistory> orderHistory = new()
     }
 };
 
-app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory>, NotFound<NotFoundMessage>> (string username) =>
+app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory.OrderHistory>, NotFound<NotFoundMessage>> (string username) =>
 {
-    OrderHistory response = null;
+    OrderHistory.OrderHistory? response = null;
     if (orderHistory.TryGetValue(username, out var orderHistoryItem))
     {
         response = orderHistoryItem;

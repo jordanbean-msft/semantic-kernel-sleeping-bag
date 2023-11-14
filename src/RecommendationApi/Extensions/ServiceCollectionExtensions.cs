@@ -6,7 +6,7 @@ namespace RecommendationApi.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
-        private static DefaultAzureCredential _defaultAzureCredential;
+        private static DefaultAzureCredential? _defaultAzureCredential;
 
         internal static IServiceCollection AddAzureServices(this IServiceCollection services)
         {
@@ -23,9 +23,9 @@ namespace RecommendationApi.Extensions
 
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                var openAIClient = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
+                var client = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
 
-                return openAIClient;
+                return client;
             });
 
             services.AddSingleton<RecommendationService>();

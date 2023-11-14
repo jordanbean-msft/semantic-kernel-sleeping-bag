@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RecommendationApi.Models;
 using RecommendationApi.Services;
 
 namespace RecommendationApi.Extensions

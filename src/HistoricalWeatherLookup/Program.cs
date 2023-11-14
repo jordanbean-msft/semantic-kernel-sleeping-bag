@@ -38,8 +38,7 @@ Dictionary<HistoricalWeatherInput, HistoricalWeather> historicalWeather = new()
 
 app.MapGet("/historical-weather-lookup", Results<Ok<HistoricalWeather>, NotFound<NotFoundMessage>> (double latitude, double longitude, int monthOfYear) =>
 {
-    HistoricalWeather historicalWeatherResponse = null;
-    historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out historicalWeatherResponse);
+    historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out HistoricalWeather? historicalWeatherResponse);
 
     return historicalWeatherResponse != null ? TypedResults.Ok(historicalWeatherResponse) : TypedResults.NotFound(new NotFoundMessage { 
         Message = $"Not Found: No historical weather found for latitude {latitude}, longitude {longitude} & monthOfYear {monthOfYear}. Make sure this is the correct GPS latitude, longitude & month of the year." 

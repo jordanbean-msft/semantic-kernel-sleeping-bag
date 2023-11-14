@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using ProductCatalog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,8 +35,7 @@ Dictionary<string, ProductCatalogItem> productCatalog = new()
 
 app.MapGet("/productCatalog/{id}", Results<Ok<ProductCatalogItem>, NotFound<NotFoundMessage>> (string id) =>
 {
-    ProductCatalogItem productCatalogItem = null;
-    productCatalog.TryGetValue(id, out productCatalogItem);
+    productCatalog.TryGetValue(id, out ProductCatalogItem? productCatalogItem);
 
     return productCatalogItem != null ? TypedResults.Ok(productCatalogItem) : TypedResults.NotFound(new NotFoundMessage { Message = $"No product catalog item found for id {id}" });
 })

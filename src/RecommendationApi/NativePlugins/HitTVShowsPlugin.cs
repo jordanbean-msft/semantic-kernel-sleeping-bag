@@ -17,7 +17,8 @@ namespace RecommendationApi.Plugins
         public async Task<string> HitTVShowsLookupAsync(int showYear, ILogger logger,
             CancellationToken cancellationToken)
         {
-            var result = await _daprClient.InvokeMethodAsync<string[]>(HttpMethod.Get, "hit-tv-shows-lookup", $"hitTVShows?show={showYear}");
+            logger.LogDebug("HitTVShowsLookupAsync: {showYear}", showYear);
+            var result = await _daprClient.InvokeMethodAsync<string[]>(HttpMethod.Get, "hit-tv-shows-lookup", $"hitTVShows?show={showYear}", cancellationToken);
 
             return JsonSerializer.Serialize(result);
         }

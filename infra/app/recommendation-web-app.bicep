@@ -79,7 +79,6 @@ module app '../core/host/container-app-upsert.bicep' = {
     location: location
     tags: union(tags, { 'azd-service-name': 'recommendation-web-app' })
     identityName: webIdentity.name
-    //imageName: imageName
     exists: exists
     serviceBinds: serviceBinds
     containerAppsEnvironmentName: containerAppsEnvironmentName

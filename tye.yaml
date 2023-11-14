@@ -52,26 +52,6 @@ services:
     readiness:
       http:
         path: /healthz
-  # - name: hit-movies-lookup
-  #   project: src/HitMovies/HitMovies.csproj
-  #   bindings:
-  #     - port: 53568
-  #   liveness:
-  #     http:
-  #       path: /healthz
-  #   readiness:
-  #     http:
-  #       path: /healthz
-  # - name: hit-tv-shows-lookup
-  #   project: src/HitTVShows/HitTVShows.csproj
-  #   bindings:
-  #     - port: 53570
-  #   liveness:
-  #     http:
-  #       path: /healthz
-  #   readiness:
-  #     http:
-  #       path: /healthz
   - name: recommendation-web-app
     workingDirectory: src/recommendation-web-app
     executable: cmd

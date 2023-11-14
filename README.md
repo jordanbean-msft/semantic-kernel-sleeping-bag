@@ -24,9 +24,12 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview)
 - Azure subscription & resource group
-- [Tye](https://github.com/dotnet/tye)
-- [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
 - [Docker](https://docs.docker.com/get-docker/)
+
+### Local development
+
+- [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
+- [Tye](https://github.com/dotnet/tye)
 - [Dapr](https://dapr.io/)
 - [Node.js with npm](https://nodejs.org/en/)
 

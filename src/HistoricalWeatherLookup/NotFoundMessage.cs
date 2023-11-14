@@ -1,4 +1,7 @@
-﻿    public record NotFoundMessage
+﻿namespace HistoricalWeatherLookup
+{
+    public record NotFoundMessage
     {
-        public string Message { get; set; }
+        public string Message { get; init; } = "";
     }
+}
