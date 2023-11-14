@@ -1,4 +1,4 @@
 public record Request
 {
-  public string Message { get; init; }
+  public string Message { get; init; } = "";
 }
