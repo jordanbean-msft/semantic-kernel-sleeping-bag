@@ -51,6 +51,10 @@ Here is a series of blog posts that go through this demo in detail.
     azd up
     ```
 
+1.  Navigate to the URL specified in the command window (or go to the Web app container app in the Azure portal) and click the `Submit` button.
+
+![homepage](.img/homepage.png)
+
 ## Run locally
 
 1.  Set the following application settings to initialize the RecommendationApi (this assumes you already have the required Azure services such as OpenAI & Application Insights deployed)..
