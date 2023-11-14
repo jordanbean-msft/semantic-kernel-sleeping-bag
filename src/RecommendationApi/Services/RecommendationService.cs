@@ -4,6 +4,7 @@ using Dapr.Client;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Planners;
+using RecommendationApi.Models;
 using RecommendationApi.Plugins;
 using System.Text.Json;
 
@@ -40,9 +41,8 @@ namespace RecommendationApi.Services
                 }));
             }
 
-            _kernel = kernelBuilder.WithLoggerFactory(loggerFactory).Build();
+            _kernel = kernelBuilder.WithLoggerFactory(_loggerFactory).Build();
             RegisterPlugins();
-            _loggerFactory = loggerFactory;
         }
 
         private void RegisterPlugins()
@@ -71,14 +71,14 @@ namespace RecommendationApi.Services
 
             var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
 
-            var response = await plan.InvokeAsync(context);
+            FunctionResult? response = await plan.InvokeAsync(context);
 
             return new Response
             {
-                FunctionCount = response.Metadata["functionCount"].ToString(),
-                Iterations = int.Parse(response.Metadata["iterations"].ToString()),
-                StepCount = int.Parse(response.Metadata["stepCount"].ToString()),
-                OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString())
+                FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
+                Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
+                StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
+                OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? new List<OpenAIMessage>()
             };
         }
     }

@@ -31,8 +31,7 @@ Dictionary<string, LatLong> locations = new()
 
 app.MapGet("/location", Results<Ok<LatLong>, NotFound<NotFoundMessage>> (string nameOfLocation) =>
 {
-    LatLong location = null;
-    locations.TryGetValue(nameOfLocation, out location);
+    locations.TryGetValue(nameOfLocation, out LatLong? location);
     return location != null ? TypedResults.Ok(location) : TypedResults.NotFound(new NotFoundMessage { Message = $"No location found for {nameOfLocation}." });
 })
 .WithName("GetLocation")

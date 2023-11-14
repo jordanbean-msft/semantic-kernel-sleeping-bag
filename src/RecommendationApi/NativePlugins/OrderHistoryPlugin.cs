@@ -17,10 +17,12 @@ namespace RecommendationApi.Plugins
             ILogger logger,
             CancellationToken cancellationToken)
         {
+            logger.LogDebug("OrderHistoryLookupAsync called with username {username}", username);
+
             var httpRequest = _daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "order-history", $"orderHistory/{username}");
             HttpResponseMessage result = await _daprClient.InvokeMethodWithResponseAsync(httpRequest, cancellationToken);
 
-            return await result.Content.ReadAsStringAsync();
+            return await result.Content.ReadAsStringAsync(cancellationToken);
         }
     }
 }

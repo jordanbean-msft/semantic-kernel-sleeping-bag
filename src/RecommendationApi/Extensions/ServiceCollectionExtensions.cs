@@ -6,7 +6,7 @@ namespace RecommendationApi.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
-        private static DefaultAzureCredential _defaultAzureCredential;
+        private static DefaultAzureCredential? _defaultAzureCredential;
 
         internal static IServiceCollection AddAzureServices(this IServiceCollection services)
         {

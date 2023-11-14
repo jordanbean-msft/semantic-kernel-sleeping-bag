@@ -10,7 +10,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
                {
-                   builder.WithOrigins("http://localhost:3000", allowedOrigins != null ? allowedOrigins : "")
+                   builder.WithOrigins("http://localhost:3000", allowedOrigins ?? "")
                    .WithHeaders("content-type");
                });
 });
@@ -22,7 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAzureServices();
 builder.Services.AddHealthChecks();
 
-string connectionString = config["ApplicationInsights:ConnectionString"];
+string? connectionString = config["ApplicationInsights:ConnectionString"];
 
 builder.Services.AddLogging(loggingBuilder =>
 {

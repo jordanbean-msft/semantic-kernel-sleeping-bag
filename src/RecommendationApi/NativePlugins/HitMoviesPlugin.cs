@@ -17,7 +17,9 @@ namespace RecommendationApi.Plugins
         public async Task<string> HistoricalSportsScoresAsync(ILogger logger,
             CancellationToken cancellationToken)
         {
-            var result = await _daprClient.InvokeMethodAsync<LatLong>(HttpMethod.Get, "historical-sports-scores-lookup", "historicalSportsScores");
+            logger.LogDebug("Getting historical sports scores");
+
+            var result = await _daprClient.InvokeMethodAsync<LatLong>(HttpMethod.Get, "historical-sports-scores-lookup", "historicalSportsScores", cancellationToken);
 
             return JsonSerializer.Serialize(result);
         }

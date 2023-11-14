@@ -20,10 +20,14 @@ namespace RecommendationApi.Plugins
             ILogger logger,
             CancellationToken cancellationToken)
         {
+#pragma warning disable CA2254 // Template should be a static expression
+            logger.LogDebug($"HistoricalWeatherLookupAsync: latitude: {latitude}, longitude: {longitude}, monthOfYear: {monthOfYear}");
+#pragma warning restore CA2254 // Template should be a static expression
+
             var httpRequest = _daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "historical-weather-lookup", $"historical-weather-lookup?latitude={latitude}&longitude={longitude}&monthOfYear={monthOfYear}");
             HttpResponseMessage result = await _daprClient.InvokeMethodWithResponseAsync(httpRequest, cancellationToken);
 
-            return await result.Content.ReadAsStringAsync();
+            return await result.Content.ReadAsStringAsync(cancellationToken);
         }
     }
 }
