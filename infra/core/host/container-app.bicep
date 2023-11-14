@@ -110,6 +110,11 @@ resource app 'Microsoft.App/containerApps@2023-04-01-preview' = {
         external: external
         targetPort: targetPort
         transport: 'auto'
+        corsPolicy: {
+          allowedOrigins: union([ 'https://portal.azure.com', 'https://ms.portal.azure.com' ], allowedOrigins)
+          allowedHeaders: [ 'content-type' ]
+        }
+
       } : null
       dapr: daprEnabled ? {
         enabled: true
