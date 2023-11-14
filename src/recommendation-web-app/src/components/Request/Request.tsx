@@ -68,7 +68,7 @@ export default function Request() {
       setSuccess(false);
       setLoading(true);
       setResponse(undefined);
-      //e.preventDefault();
+
       const response = await fetch(`${config.api.baseUrl}/recommendation`, {
         method: "POST",
         headers: {
@@ -82,6 +82,7 @@ export default function Request() {
 
         return response.json();
       });
+
       setResponse(response);
       setSuccess(true);
       setLoading(false);

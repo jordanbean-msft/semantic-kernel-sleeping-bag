@@ -23,9 +23,9 @@ namespace RecommendationApi.Extensions
 
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                var openAIClient = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
+                var client = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
 
-                return openAIClient;
+                return client;
             });
 
             services.AddSingleton<RecommendationService>();
