@@ -164,8 +164,8 @@ var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var baseTags = { 'azd-env-name': environmentName }
 var updatedTags = union(empty(tags) ? {} : base64ToJson(tags), baseTags)
-var apiContainerAppNameOrDefault = '${abbrs.appContainerApps}web-${resourceToken}'
-var corsAcaUrl = 'https://${apiContainerAppNameOrDefault}.${containerApps.outputs.defaultDomain}'
+var webContainerAppNameOrDefault = '${abbrs.appContainerApps}web-app-${resourceToken}'
+var corsAcaUrl = 'https://${webContainerAppNameOrDefault}.${containerApps.outputs.defaultDomain}'
 
 // Organize resources in a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
