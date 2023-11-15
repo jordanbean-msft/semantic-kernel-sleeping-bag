@@ -27,7 +27,7 @@ namespace RecommendationApi.Services
 
             ArgumentNullException.ThrowIfNull(deployedModelName, "OpenAI:ChatModelName is required");
 
-            var kernelBuilder = new KernelBuilder().WithAzureChatCompletionService(deployedModelName, client);
+            var kernelBuilder = new KernelBuilder().WithAzureOpenAIChatCompletionService(deployedModelName, client);
             var embeddingModelName = _configuration["OpenAI:EmbeddingModelName"];
 
             if (!string.IsNullOrWhiteSpace(embeddingModelName))
@@ -35,7 +35,7 @@ namespace RecommendationApi.Services
                 var endpoint = configuration["OpenAI:Endpoint"];
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                kernelBuilder = kernelBuilder.WithAzureTextEmbeddingGenerationService(embeddingModelName, endpoint, new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                kernelBuilder = kernelBuilder.WithAzureOpenAITextEmbeddingGenerationService(embeddingModelName, endpoint, new DefaultAzureCredential(new DefaultAzureCredentialOptions
                 {
                     TenantId = configuration["EntraID:TenantId"]
                 }));
@@ -78,7 +78,7 @@ namespace RecommendationApi.Services
                 FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
                 Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
                 StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
-                OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? new List<OpenAIMessage>()
+                OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
             };
         }
     }
