@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.FileProviders;
 using ProductCatalog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,7 +41,18 @@ app.MapGet("/productCatalog/{id}", Results<Ok<ProductCatalogItem>, NotFound<NotF
     return productCatalogItem != null ? TypedResults.Ok(productCatalogItem) : TypedResults.NotFound(new NotFoundMessage { Message = $"No product catalog item found for id {id}" });
 })
 .WithName("GetProductCatalogItem")
-.WithOpenApi();
+.WithOpenApi(generatedOperations =>
+{
+    generatedOperations.Summary = "Get the product specifications. This includes data such as length, highest & lowest supported temperature in Fahrenheit";
+    generatedOperations.Parameters[0].Description = "The string product ID of the product. This should be a string, not JSON.";
+    return generatedOperations;
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
+    RequestPath = "/.well-known"
+});
 
 app.MapHealthChecks("/healthz");
 

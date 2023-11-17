@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.FileProviders;
 using OrderHistory;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,14 +32,14 @@ Dictionary<string, OrderHistory.OrderHistory> orderHistory = new()
             OrderDate = "2021-01-01",
             OrderTotal = "10",
             OrderStatus = "Shipped",
-            OrderItems = new List<OrderItems> {
+            OrderItems = [
                 new() {
                     ProductId = "12345",
                     ProductName = "Eco Elite Sleeping Bag",
                     ProductPrice = "10",
                     ProductQuantity = "1"
                 }
-            }
+            ]
     }
     }
 };
@@ -53,7 +54,18 @@ app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory.OrderHistory>, No
     return response != null ? TypedResults.Ok(response) : TypedResults.NotFound(new NotFoundMessage { Message = $"No order history found for user {username}" });
 })
 .WithName("GetOrderHistory")
-.WithOpenApi();
+.WithOpenApi(generatedOperations =>
+{
+    generatedOperations.Summary = "Get the order history for a user, including all the products they purchased (which includes the product ID). This is a list of what the user owns.";
+    generatedOperations.Parameters[0].Description = "The string username of the user. There should be no curly braces around the username.";
+    return generatedOperations;
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
+    RequestPath = "/.well-known"
+});
 
 app.MapHealthChecks("/healthz");
 

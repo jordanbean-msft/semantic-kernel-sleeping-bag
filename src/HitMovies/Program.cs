@@ -1,4 +1,5 @@
 using HitMovies;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +20,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-List<HitMovie> hits = new()
-{
+List<HitMovie> hits =
+[
     new(){
         Title = "GalaxyQuest",
-        Actors = new(){ "Rainn Wilson" },
-        Tags = new(){ "comedy", "sci-fi" }
+        Actors = ["Rainn Wilson"],
+        Tags = ["comedy", "sci-fi"]
     }
-};
+];
 
 app.MapGet("/hitMoviesByTag", (List<string> tags) =>
 {
@@ -34,6 +35,12 @@ app.MapGet("/hitMoviesByTag", (List<string> tags) =>
 })
 .WithName("GetHitMoviesByTag")
 .WithOpenApi();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
+    RequestPath = "/.well-known"
+});
 
 app.MapHealthChecks("/healthz");
 

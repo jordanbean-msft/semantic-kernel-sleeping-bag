@@ -85,7 +85,7 @@ module app '../core/host/container-app-upsert.bicep' = {
     containerRegistryName: containerRegistryName
     env: []
     targetPort: 8080
-    external: false
+    external: true
     daprEnabled: true
     daprAppId: 'historical-weather-lookup'
     daprAppProtocol: 'http'
