@@ -55,7 +55,7 @@ services:
   - name: recommendation-web-app
     workingDirectory: src/recommendation-web-app
     executable: cmd
-    args: '/c "npm prestart & npm start"'
+    args: '/c "npm start"'
     liveness:
       http:
         path: /healthz
