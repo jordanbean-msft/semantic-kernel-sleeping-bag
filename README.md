@@ -36,7 +36,7 @@ Here is a series of blog posts that go through this demo in detail.
 
 ### Local development
 
-- [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)
+- [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Tye](https://github.com/dotnet/tye)
 - [Dapr](https://dapr.io/)
 - [Node.js with npm](https://nodejs.org/en/)
