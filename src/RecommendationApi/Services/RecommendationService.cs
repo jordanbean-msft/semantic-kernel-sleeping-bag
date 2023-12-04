@@ -58,7 +58,7 @@ namespace RecommendationApi.Services
             var contextVariables = new ContextVariables
             {
                 ["username"] = "dkschrute",
-                ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
+                ["current_date"] = DateTime.Now.ToString("MMM-dd-yyyy"),
                 ["message"] = request.Message
             };
 

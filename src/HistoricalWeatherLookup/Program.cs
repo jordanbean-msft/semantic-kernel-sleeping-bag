@@ -26,7 +26,7 @@ Dictionary<HistoricalWeatherInput, HistoricalWeather> historicalWeather = new()
         new HistoricalWeatherInput {
             Latitude = -41.814099,
             Longitude = -68.907384,
-            MonthOfYear = 12
+            MonthOfYear = DateTime.Now.AddMonths(1).Month // always next month
         },
         new HistoricalWeather
         {
