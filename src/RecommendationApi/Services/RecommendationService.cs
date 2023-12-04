@@ -4,6 +4,8 @@ using Dapr.Client;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Planners;
+using Microsoft.SemanticKernel.Planning;
+using Microsoft.SemanticKernel.Plugins.Core;
 using RecommendationApi.Models;
 using RecommendationApi.Plugins;
 using System.Text.Json;
@@ -12,7 +14,7 @@ namespace RecommendationApi.Services
 {
     public class RecommendationService
     {
-        private readonly IKernel _kernel;
+        private readonly Kernel _kernel;
         private readonly IConfiguration _configuration;
         private readonly DaprClient _daprClient;
         private readonly ILoggerFactory _loggerFactory;
@@ -41,7 +43,7 @@ namespace RecommendationApi.Services
                 }));
             }
 
-            _kernel = kernelBuilder.WithLoggerFactory(_loggerFactory).Build();
+            _kernel = (Kernel)kernelBuilder.WithLoggerFactory(_loggerFactory).Build();
             RegisterPlugins();
         }
 
@@ -51,6 +53,10 @@ namespace RecommendationApi.Services
             _kernel.ImportFunctions(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
             _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
             _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
+            //_kernel.ImportPluginFromObject(new HistoricalWeatherLookupPlugin(_daprClient), "HistoricalWeatherLookupPlugin");
+            //_kernel.ImportPluginFromObject(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
+            //_kernel.ImportPluginFromObject(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
+            //_kernel.ImportPluginFromObject(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
         }
 
         public async Task<Response> ResponseAsync(Request request)
@@ -59,26 +65,41 @@ namespace RecommendationApi.Services
             {
                 ["username"] = "dkschrute",
                 ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
-                ["message"] = request.Message
+                //["message"] = request.Message
             };
 
             var context = _kernel.CreateNewContext(contextVariables);
 
-            var planner = new StepwisePlanner(_kernel, new StepwisePlannerConfig
+            var planner = new FunctionCallingStepwisePlanner(_kernel, new FunctionCallingStepwisePlannerConfig
+            //var planner = new StepwisePlanner(_kernel, new StepwisePlannerConfig
             {
-                MaxIterations = 20
+                MaxIterations = 20,
+                ModelSettings = new Microsoft.SemanticKernel.Connectors.AI.OpenAI.OpenAIRequestSettings
+                {
+                    ChatSystemPrompt = "You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
+                    ExtensionData = new Dictionary<string, object>{
+                        ["username"] = "dkschrute",
+                        ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
+                    }
+                }
             });
 
-            var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
+            FunctionCallingStepwisePlannerResult? response = await planner.ExecuteAsync(request.Message);
 
-            FunctionResult? response = await plan.InvokeAsync(context);
+            //var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
 
+            //FunctionResult? response = await plan.InvokeAsync(context);
+
+            //return new Response
+            //{
+            //    FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
+            //    Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
+            //    StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
+            //    OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
+            //};
             return new Response
             {
-                FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
-                Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
-                StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
-                OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
+                OpenAIMessages = new List<OpenAIMessage> { new OpenAIMessage { FinalAnswer = response.FinalAnswer } }
             };
         }
     }

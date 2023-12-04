@@ -24,11 +24,11 @@ app.UseHttpsRedirection();
 Dictionary<string, OrderHistory.OrderHistory> orderHistory = new()
 {
     {
-    "dkschrute",
+    "dkschrute",// "Jordan Bean",
     new OrderHistory.OrderHistory
     {
             OrderId = "1",
-            CustomerId = "dkschrute",
+            CustomerId = "dkschrute",//"Jordan Bean",
             OrderDate = "2021-01-01",
             OrderTotal = "10",
             OrderStatus = "Shipped",
