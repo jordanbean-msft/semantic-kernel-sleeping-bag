@@ -17,10 +17,10 @@ We need the RecommendationAPI to be able to call all of these APIs and then comb
 
 Here is a series of blog posts that go through this demo in detail.
 
-- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 1](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-1/)
-- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 2 (demo app implementation)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-2/)
-- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 3 (demo app)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-3-demo-app/)
-- [How to build your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 4 (local development & deployment details)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-4-local-development-deployment-details/)
+- [How to enhance your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 1](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-1/)
+- [How to enhance your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 2 (demo app implementation)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-2/)
+- [How to enhance your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 3 (demo app)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-3-demo-app/)
+- [How to enhance your own chatbot using C# Semantic Kernel & Azure OpenAI that plans & orchestrates its own API calls - part 4 (local development & deployment details)](https://jordanbeandev.com/how-to-build-your-own-chatbot-using-c-semantic-kernel-azure-openai-part-4-local-development-deployment-details/)
 - [How to dynamically set a runtime config value for a React app in Azure Container Apps](https://jordanbeandev.com/how-to-dynamically-set-a-runtime-config-value-for-a-react-app-in-azure-container-apps/)
 
 ## Disclaimer
@@ -54,6 +54,9 @@ Here is a series of blog posts that go through this demo in detail.
 1.  Navigate to the URL specified in the command window (or go to the Web app container app in the Azure portal) and click the `Submit` button.
 
 ![homepage](.img/homepage.png)
+
+> [!NOTE]  
+> Since this is using generative AI, there is no guarantee that the plan generated will exactly match the screenshots. You may have to run the demo several times to get it to output the desired result.
 
 ## Run locally
 
