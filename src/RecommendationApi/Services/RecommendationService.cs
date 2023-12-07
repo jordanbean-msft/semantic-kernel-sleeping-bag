@@ -1,94 +1,100 @@
-﻿using Azure.AI.OpenAI;
-using Azure.Identity;
-using Dapr.Client;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Orchestration;
-using Microsoft.SemanticKernel.Planners;
+﻿using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
 using Microsoft.SemanticKernel.Planning;
-using Microsoft.SemanticKernel.Plugins.Core;
+using Microsoft.SemanticKernel.Planning.Handlebars;
 using RecommendationApi.Models;
 using RecommendationApi.Plugins;
 using System.Text.Json;
 
+#pragma warning disable SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Services
 {
     public class RecommendationService
     {
         private readonly Kernel _kernel;
-        private readonly IConfiguration _configuration;
-        private readonly DaprClient _daprClient;
-        private readonly ILoggerFactory _loggerFactory;
 
-        public RecommendationService(OpenAIClient client, IConfiguration configuration, DaprClient daprClient, ILoggerFactory loggerFactory)
+        public RecommendationService(Kernel kernel)
         {
-            _configuration = configuration;
-            _daprClient = daprClient;
-            _loggerFactory = loggerFactory;
+            _kernel = kernel;
 
-            var deployedModelName = _configuration["OpenAI:ChatModelName"];
-
-            ArgumentNullException.ThrowIfNull(deployedModelName, "OpenAI:ChatModelName is required");
-
-            var kernelBuilder = new KernelBuilder().WithAzureOpenAIChatCompletionService(deployedModelName, client);
-            var embeddingModelName = _configuration["OpenAI:EmbeddingModelName"];
-
-            if (!string.IsNullOrWhiteSpace(embeddingModelName))
-            {
-                var endpoint = configuration["OpenAI:Endpoint"];
-                ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
-
-                kernelBuilder = kernelBuilder.WithAzureOpenAITextEmbeddingGenerationService(embeddingModelName, endpoint, new DefaultAzureCredential(new DefaultAzureCredentialOptions
-                {
-                    TenantId = configuration["EntraID:TenantId"]
-                }));
-            }
-
-            _kernel = (Kernel)kernelBuilder.WithLoggerFactory(_loggerFactory).Build();
-            RegisterPlugins();
-        }
-
-        private void RegisterPlugins()
-        {
-            _kernel.ImportFunctions(new HistoricalWeatherLookupPlugin(_daprClient), "HistoricalWeatherLookupPlugin");
-            _kernel.ImportFunctions(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
-            _kernel.ImportFunctions(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
-            _kernel.ImportFunctions(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
-            //_kernel.ImportPluginFromObject(new HistoricalWeatherLookupPlugin(_daprClient), "HistoricalWeatherLookupPlugin");
-            //_kernel.ImportPluginFromObject(new OrderHistoryPlugin(_daprClient), "OrderHistoryPlugin");
-            //_kernel.ImportPluginFromObject(new ProductCatalogPlugin(_daprClient), "ProductCatalogPlugin");
-            //_kernel.ImportPluginFromObject(new LocationLookupPlugin(_daprClient), "LocationLookupPlugin");
+            _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
+            _kernel.ImportPluginFromType<LocationLookupPlugin>();
+            _kernel.ImportPluginFromType<OrderHistoryPlugin>();
+            _kernel.ImportPluginFromType<ProductCatalogPlugin>();
         }
 
         public async Task<Response> ResponseAsync(Request request)
         {
-            var contextVariables = new ContextVariables
+            var username = "dkschrute";
+            var currentDate = DateTime.Now.ToString("MMM-dd-yyyy");
+
+            #region FunctionCallingStepwisePlanner
+            var config = new FunctionCallingStepwisePlannerConfig
             {
-                ["username"] = "dkschrute",
-                ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
-                //["message"] = request.Message
+                MaxIterations = 10,
+                MaxTokens = 4000,
+                ExecutionSettings = new OpenAIPromptExecutionSettings
+                {
+                    ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request {username}. The current date is {currentDate}. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
+                    FunctionCallBehavior = FunctionCallBehavior.AutoInvokeKernelFunctions,
+                    MaxTokens = 4000
+                }
             };
 
-            var context = _kernel.CreateNewContext(contextVariables);
+            var planner = new FunctionCallingStepwisePlanner(config);
 
-            var planner = new FunctionCallingStepwisePlanner(_kernel, new FunctionCallingStepwisePlannerConfig
-            //var planner = new StepwisePlanner(_kernel, new StepwisePlannerConfig
+            var response = await planner.ExecuteAsync(_kernel, request.Message);
+            return new Response
             {
-                MaxIterations = 20,
-                ModelSettings = new Microsoft.SemanticKernel.Connectors.AI.OpenAI.OpenAIRequestSettings
-                {
-                    ChatSystemPrompt = "You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
-                    ExtensionData = new Dictionary<string, object>{
-                        ["username"] = "dkschrute",
-                        ["current_date"] = DateTime.Now.ToString("MM-dd-yyyy"),
-                    }
-                }
-            });
+                OpenAIMessages = [new OpenAIMessage { FinalAnswer = response.FinalAnswer }]
+            };
+            #endregion
 
-            FunctionCallingStepwisePlannerResult? response = await planner.ExecuteAsync(request.Message);
+            #region HandlebarsPlanner
+            //var config = new HandlebarsPlannerConfig
+            //{
+            //    AllowLoops = true,
+            //    MaxTokens = 4000
+            //};
 
-            //var plan = planner.CreatePlan("You are a customer support chatbot. You should answer the question posed by the user in the \"{{$message}}\". Make sure and look up any needed context for the specific user that is making the request (the \"{{$username}}\"). The current date is \"{{$current_date}}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
+            //var planner = new HandlebarsPlanner(config);
+            //HandlebarsPlan plan = null;
+            //try
+            //{
+            //    plan = await planner.CreatePlanAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user \"{request.Message}\". Make sure and look up any needed context for the specific user that is making the request \"{username}\". The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
+            //}
+            //catch (Exception ex)
+            //{
+            //    return new Response
+            //    {
+            //        FunctionCount = ex.Message
+            //    };
+            //}
 
-            //FunctionResult? response = await plan.InvokeAsync(context);
+            //var response = plan.Invoke(_kernel, [], CancellationToken.None);
+            //return new Response
+            //{
+            //    //FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
+            //    //Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
+            //    //StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
+            //    //OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
+            //    FunctionCount = response ?? ""
+            //};
+            #endregion
+
+            #region StepwisePlanner
+            //var stepwisePlannerConfig = new StepwisePlannerConfig
+            //{
+            //    MaxIterations = 10,
+            //    MaxTokens = 4000
+            //};
+
+            //var planner = new StepwisePlanner(_kernel, stepwisePlannerConfig);
+
+            //var plan = planner.CreatePlan($"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
+
+            //FunctionResult? response = await plan.InvokeAsync(request.Message);
 
             //return new Response
             //{
@@ -96,11 +102,11 @@ namespace RecommendationApi.Services
             //    Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
             //    StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
             //    OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
-            //};
-            return new Response
-            {
-                OpenAIMessages = new List<OpenAIMessage> { new OpenAIMessage { FinalAnswer = response.FinalAnswer } }
-            };
+            //}; 
+            #endregion
+
         }
     }
 }
+#pragma warning restore SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning restore SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
