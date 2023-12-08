@@ -8,10 +8,10 @@ For example, a customer might ask "Will my sleeping bag work for my trip to Pata
 
 In order to do this, the code needs to be able to call several different data sources to answer the question.
 
-    1.  OrderHistory - This is an API that returns the customer's order history (including the product IDs of the items they ordered).
-    1.  ProductCatalog - This is an API that returns the product details for a given product ID.
-    1.  LocationLookup - This ia an API that returns the GPS coordindates of a given location.
-    1.  HistoricalWeather - This is an API that returns the average temperature for a given GPS location and date.
+1.  OrderHistory - This is an API that returns the customer's order history (including the product IDs of the items they ordered).
+1.  ProductCatalog - This is an API that returns the product details for a given product ID.
+1.  LocationLookup - This ia an API that returns the GPS coordindates of a given location.
+1.  HistoricalWeather - This is an API that returns the average temperature for a given GPS location and date.
 
 We need the RecommendationAPI to be able to call all of these APIs and then combine the results into a single answer. Semantic Kernel enables us to orchestrate these API calls via the StepwisePlanner. This planner will make multiple calls to the OpenAI service, make up its own plan to answer the question based upon the data & native plugins it has access to, then execute the plan.
 
