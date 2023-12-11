@@ -42,16 +42,16 @@ services:
     readiness:
       http:
         path: /healthz
-  # - name: recommendation-api
-  #   project: src/RecommendationApi/RecommendationApi.csproj
-  #   bindings:
-  #     - port: 53566
-  #   liveness:
-  #     http:
-  #       path: /healthz
-  #   readiness:
-  #     http:
-  #       path: /healthz
+  - name: recommendation-api
+    project: src/RecommendationApi/RecommendationApi.csproj
+    bindings:
+      - port: 53566
+    liveness:
+      http:
+        path: /healthz
+    readiness:
+      http:
+        path: /healthz
   - name: recommendation-web-app
     workingDirectory: src/recommendation-web-app
     executable: cmd

@@ -1,26 +1,31 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.Identity;
+using Dapr.Client;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.AI.Embeddings;
+using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
+using Microsoft.SemanticKernel.Memory;
+using Microsoft.SemanticKernel.Plugins.Memory;
 using RecommendationApi.Plugins;
 using RecommendationApi.Services;
 
+#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0011 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
-        private static DefaultAzureCredential? _defaultAzureCredential;
-
         internal static IServiceCollection AddAzureServices(this IServiceCollection services)
         {
             services.AddSingleton(sp =>
             {
                 var config = sp.GetRequiredService<IConfiguration>();
 
-                _defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
                 {
                     TenantId = config["EntraID:TenantId"]
                 });
@@ -29,7 +34,7 @@ namespace RecommendationApi.Extensions
 
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                var client = new OpenAIClient(new Uri(endpoint), _defaultAzureCredential);
+                var client = new OpenAIClient(new Uri(endpoint), defaultAzureCredential);
 
                 return client;
             });
@@ -67,6 +72,26 @@ namespace RecommendationApi.Extensions
 
                 kernelBuilder.Services.AddAzureOpenAIChatCompletion(chatCompletionDeploymentName, chatCompletionModelId, sp.GetRequiredService<OpenAIClient>());
                 kernelBuilder.Services.AddAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, embeddingModelId, sp.GetRequiredService<OpenAIClient>());
+                
+                var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    TenantId = config["EntraID:TenantId"]
+                });
+                
+                var endpoint = config["OpenAI:Endpoint"];
+                ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
+
+                kernelBuilder.Services.AddScoped(semanticTextMemory =>
+                {
+                    var memory = new MemoryBuilder()
+                        .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, embeddingModelId, endpoint, defaultAzureCredential)
+                        .WithMemoryStore(new VolatileMemoryStore())
+                        .Build();
+
+                    return memory;
+                });
+
+                kernelBuilder.Services.AddDaprClient();
 
                 return kernelBuilder.Build();
             });
@@ -75,4 +100,7 @@ namespace RecommendationApi.Extensions
         }
     }
 }
+
+#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0011 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

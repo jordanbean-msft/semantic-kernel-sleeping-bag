@@ -4,12 +4,12 @@ using System.ComponentModel;
 
 namespace RecommendationApi.Plugins
 {
-    public class ProductCatalogPlugin
+    public class ProductCatalogPlugin(DaprClient daprClient)
     {
         [KernelFunction, Description("Get the product specifications. This includes data such as length, highest & lowest supported temperature in Fahrenheit")]
+        [return: Description("The product specifications for the product. Not Found will be returned if the product ID is not valid.")]
         public async Task<string> ProductCatalogItemLookupAsync(
             [Description("The string product ID of the product. This should be a string, not JSON.")] string productId, 
-            DaprClient daprClient,
             ILogger logger,
             CancellationToken cancellationToken)
         {
