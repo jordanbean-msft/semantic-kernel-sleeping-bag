@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>cae0029f-83e7-4436-92bb-36837d429811</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.1.23557.2" />
+    <PackageReference Include="Aspire.Hosting.Dapr" Version="8.0.0-preview.1.23557.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HistoricalWeatherLookup\HistoricalWeatherLookup.csproj" />
+    <ProjectReference Include="..\LocationLookup\LocationLookup.csproj" />
+    <ProjectReference Include="..\OrderHistory\OrderHistory.csproj" />
+    <ProjectReference Include="..\ProductCatalog\ProductCatalog.csproj" />
+    <ProjectReference Include="..\RecommendationApi\RecommendationApi.csproj" />
+  </ItemGroup>
+
+</Project>

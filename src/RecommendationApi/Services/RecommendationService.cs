@@ -1,32 +1,27 @@
 ﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.AI.Embeddings;
-using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
-using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextEmbedding;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Planning;
-using Microsoft.SemanticKernel.Plugins.Memory;
 
 //using Microsoft.SemanticKernel.Planning.Handlebars;
 using RecommendationApi.Models;
 using RecommendationApi.Plugins;
 using System.Text.Json;
 
-#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning disable SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning disable SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Services
 {
     public class RecommendationService
     {
         private readonly Kernel _kernel;
-        private readonly ISemanticTextMemory _memory;
+        //private readonly ISemanticTextMemory _memory;
 
         public RecommendationService(Kernel kernel)
         {
             _kernel = kernel;
-            _memory = kernel.GetRequiredService<ISemanticTextMemory>();
+            //_memory = kernel.GetRequiredService<ISemanticTextMemory>();
 
             //var historicalWeatherLookupPlugin = _kernel.CreatePluginFromType<HistoricalWeatherLookupPlugin>();
 
@@ -64,27 +59,19 @@ namespace RecommendationApi.Services
             //var kernelWithRelevantFunctions = _kernel.Clone();
             //kernelWithRelevantFunctions.Plugins.Add(relevantRecommendationFunctions);
 
-            _kernel.PromptRendering += _kernel_PromptRendering;
-            _kernel.PromptRendered += _kernel_PromptRendered;
-            _kernel.FunctionInvoking += _kernel_FunctionInvoking;
-            _kernel.FunctionInvoked += _kernel_FunctionInvoked;
+            _kernel.PromptRendering += Kernel_PromptRendering;
+            _kernel.PromptRendered += Kernel_PromptRendered;
+            _kernel.FunctionInvoking += Kernel_FunctionInvoking;
+            _kernel.FunctionInvoked += Kernel_FunctionInvoked;
 
             #region FunctionCallingStepwisePlanner
             var config = new FunctionCallingStepwisePlannerConfig
             {
                 //MaxIterations = 5,
-                //MaxTokens = 2000,
-                //MaxTokensRatio = 0.25,
-                //SemanticMemoryConfig = new SemanticMemoryConfig
-                //{
-                //    Memory = _kernel.GetRequiredService<ISemanticTextMemory>(),
-                //    RelevancyThreshold = 0.78
-                //},
                 ExecutionSettings = new OpenAIPromptExecutionSettings
                 {
                     ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request {username}. The current date is {currentDate}. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
-                    FunctionCallBehavior = FunctionCallBehavior.AutoInvokeKernelFunctions,
-                    //MaxTokens = 2000                    
+                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
                 }                
             };
 
@@ -106,6 +93,7 @@ namespace RecommendationApi.Services
             {
                 OpenAIMessages = errorContent ?? ([new OpenAIMessage { FinalAnswer = response.FinalAnswer }])
             };
+
             #endregion
 
             #region HandlebarsPlanner
@@ -164,29 +152,27 @@ namespace RecommendationApi.Services
 
         }
 
-        private void _kernel_FunctionInvoked(object? sender, Microsoft.SemanticKernel.Events.FunctionInvokedEventArgs e)
+        private void Kernel_FunctionInvoked(object? sender, FunctionInvokedEventArgs e)
         {
-            Console.WriteLine(e.Result);
+            Console.WriteLine(e);
         }
 
-        private void _kernel_FunctionInvoking(object? sender, Microsoft.SemanticKernel.Events.FunctionInvokingEventArgs e)
+        private void Kernel_FunctionInvoking(object? sender, FunctionInvokingEventArgs e)
         {
-            Console.WriteLine(e.Function.Name);
+            Console.WriteLine(e);
         }
 
-        private void _kernel_PromptRendered(object? sender, Microsoft.SemanticKernel.Events.PromptRenderedEventArgs e)
+        private void Kernel_PromptRendered(object? sender, PromptRenderedEventArgs e)
         {
-            Console.WriteLine(e.RenderedPrompt);
+            Console.WriteLine(e);
         }
 
-        private void _kernel_PromptRendering(object? sender, Microsoft.SemanticKernel.Events.PromptRenderingEventArgs e)
+        private void Kernel_PromptRendering(object? sender, PromptRenderingEventArgs e)
         {
-            Console.WriteLine(e.Function.Name);
+            Console.WriteLine(e);
         }
     }
 }
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning restore SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning restore SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning restore SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

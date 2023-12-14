@@ -1,20 +1,9 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.Identity;
-using Dapr.Client;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.AI.Embeddings;
-using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
 using Microsoft.SemanticKernel.Memory;
-using Microsoft.SemanticKernel.Plugins.Memory;
-using RecommendationApi.Plugins;
 using RecommendationApi.Services;
 
-#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning disable SKEXP0011 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning disable SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Extensions
 {
     internal static class ServiceCollectionExtensions
@@ -51,7 +40,7 @@ namespace RecommendationApi.Extensions
                 var chatCompletionModelId = config["OpenAI:ChatCompletionModelId"];
                 ArgumentNullException.ThrowIfNull(chatCompletionModelId, "OpenAI:ChatCompletionModelId is required");
 
-                var kernelBuilder = new KernelBuilder();
+                var kernelBuilder = Kernel.CreateBuilder();
 
                 kernelBuilder.Services.AddLogging(configure =>
                 {
@@ -67,11 +56,11 @@ namespace RecommendationApi.Extensions
                 var embeddingDeploymentName = config["OpenAI:EmbeddingDeploymentName"];
                 ArgumentNullException.ThrowIfNull(embeddingDeploymentName, "OpenAI:EmbeddingDeploymentName is required");
 
-                var embeddingModelId = config["OpenAI:EmbeddingModelId"];
-                ArgumentNullException.ThrowIfNull(embeddingModelId, "OpenAI:EmbeddingModelId is required");
+                //var embeddingModelId = config["OpenAI:EmbeddingModelId"];
+                //ArgumentNullException.ThrowIfNull(embeddingModelId, "OpenAI:EmbeddingModelId is required");
 
-                kernelBuilder.Services.AddAzureOpenAIChatCompletion(chatCompletionDeploymentName, chatCompletionModelId, sp.GetRequiredService<OpenAIClient>());
-                kernelBuilder.Services.AddAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, embeddingModelId, sp.GetRequiredService<OpenAIClient>());
+                kernelBuilder.AddAzureOpenAIChatCompletion(chatCompletionDeploymentName, sp.GetRequiredService<OpenAIClient>());
+                //kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, sp.GetRequiredService<OpenAIClient>());
                 
                 var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
                 {
@@ -81,15 +70,15 @@ namespace RecommendationApi.Extensions
                 var endpoint = config["OpenAI:Endpoint"];
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                kernelBuilder.Services.AddScoped(semanticTextMemory =>
-                {
-                    var memory = new MemoryBuilder()
-                        .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, embeddingModelId, endpoint, defaultAzureCredential)
-                        .WithMemoryStore(new VolatileMemoryStore())
-                        .Build();
+                //kernelBuilder.Services.AddScoped(semanticTextMemory =>
+                //{
+                //    var memory = new MemoryBuilder()
+                //        .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, embeddingModelId, endpoint, defaultAzureCredential)
+                //        .WithMemoryStore(new VolatileMemoryStore())
+                //        .Build();
 
-                    return memory;
-                });
+                //    return memory;
+                //});
 
                 kernelBuilder.Services.AddDaprClient();
 
@@ -100,7 +89,3 @@ namespace RecommendationApi.Extensions
         }
     }
 }
-
-#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning restore SKEXP0011 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning disable SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
