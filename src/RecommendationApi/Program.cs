@@ -12,7 +12,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
                {
-                   builder.WithOrigins("http://localhost:58762", allowedOrigins ?? "")
+                   builder.WithOrigins("http://localhost:3000", allowedOrigins ?? "")
                    .WithHeaders("content-type");
                });
 });

@@ -16,6 +16,7 @@
     "@types/react-dom": "^18.2.15",
     "@types/react-router-dom": "^5.3.3",
     "dotenv": "^16.3.1",
+    "mermaid": "8.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0",
@@ -30,7 +31,6 @@
     "build": "react-scripts build",
     "postbuild": "shx cp ./entrypoint.sh ./build && shx cp staticwebapp.config.json ./build || echo 'post-build completed'",
     "pretest": "npm run envconfig",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -50,5 +50,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "mermaid": "^10.6.1"
   }
 }

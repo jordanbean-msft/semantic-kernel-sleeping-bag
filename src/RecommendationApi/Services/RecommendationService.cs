@@ -1,4 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Planning;
@@ -72,13 +73,14 @@ namespace RecommendationApi.Services
                 {
                     ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request {username}. The current date is {currentDate}. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
                     ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-                }                
+                }
+                
             };
 
             var planner = new FunctionCallingStepwisePlanner(config);
 
             FunctionCallingStepwisePlannerResult response = null;
-            List<OpenAIMessage> errorContent = null;
+            Response returnValue = new Response();
 
             try
             {
@@ -86,13 +88,17 @@ namespace RecommendationApi.Services
             }
             catch(Exception ex)
             {
-                 errorContent = [new OpenAIMessage { FinalAnswer = ex.Message }];
+                 returnValue.FinalAnswer = ex.Message;
             }
 
-            return new Response
+            if (returnValue.FinalAnswer != "")
             {
-                OpenAIMessages = errorContent ?? ([new OpenAIMessage { FinalAnswer = response.FinalAnswer }])
-            };
+                return returnValue;
+            }
+            else
+            {
+                return ParseResponse(response);
+            }
 
             #endregion
 
@@ -170,6 +176,38 @@ namespace RecommendationApi.Services
         private void Kernel_PromptRendering(object? sender, PromptRenderingEventArgs e)
         {
             Console.WriteLine(e);
+        }
+
+        private Response ParseResponse(FunctionCallingStepwisePlannerResult functionCallingStepwisePlannerResult)
+        {
+            var response = new Response
+            {
+                Iterations = functionCallingStepwisePlannerResult.Iterations,
+                FinalAnswer = functionCallingStepwisePlannerResult.FinalAnswer,
+                ChatHistory = ParseChatHistory(functionCallingStepwisePlannerResult.ChatHistory)
+            };
+
+            return response;
+        }
+
+        private List<ChatHistoryItem> ParseChatHistory(ChatHistory? chatHistory)
+        {
+            var chatHistoryItems = new List<ChatHistoryItem>();
+            foreach (var item in chatHistory)
+            {
+                var chatHistoryItem = new ChatHistoryItem
+                {
+                    Content = item.Content,
+                    Role = item.Role.Label,
+                    PromptTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
+                    CompletionTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.CompletionTokens ?? 0,
+                    TotalTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
+                    FunctionName = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Name ?? "",
+                    FunctionArguments = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Arguments ?? ""
+                    };
+                chatHistoryItems.Add(chatHistoryItem);
+            }
+            return chatHistoryItems;
         }
     }
 }

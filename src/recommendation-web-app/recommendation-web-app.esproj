@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.239112-alpha">
   <PropertyGroup>
-    <BuildCommand>npm run </BuildCommand>
+    <BuildCommand>npm run build</BuildCommand>
     <StartupCommand>
     </StartupCommand>
   </PropertyGroup>

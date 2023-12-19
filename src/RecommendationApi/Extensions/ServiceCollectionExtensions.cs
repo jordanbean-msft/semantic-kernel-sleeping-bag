@@ -59,7 +59,7 @@ namespace RecommendationApi.Extensions
                 //var embeddingModelId = config["OpenAI:EmbeddingModelId"];
                 //ArgumentNullException.ThrowIfNull(embeddingModelId, "OpenAI:EmbeddingModelId is required");
 
-                kernelBuilder.AddAzureOpenAIChatCompletion(chatCompletionDeploymentName, sp.GetRequiredService<OpenAIClient>());
+                kernelBuilder.AddAzureOpenAIChatCompletion(chatCompletionDeploymentName, sp.GetRequiredService<OpenAIClient>(), modelId: chatCompletionModelId);
                 //kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, sp.GetRequiredService<OpenAIClient>());
                 
                 var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions

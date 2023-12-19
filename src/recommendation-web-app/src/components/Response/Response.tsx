@@ -12,39 +12,47 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import ResponseGraph from "../ResponseGraph/ResponseGraph";
 
 export interface OpenAIMessage {
-  action: string;
-  final_answer: string;
-  thought: string;
-  original_response: string;
-  observation: string;
+  content: string;
+  role: string;
+  functionName: string;
+  functionArguments: string;
+  completionTokens: number;
+  promptTokens: number;
+  totalTokens: number;
 }
 
 export interface ResponseMessage {
-  openAIMessages: Array<OpenAIMessage>;
+  iterations: number;
+  chatHistory: Array<OpenAIMessage>;
+  finalAnswer: string;
 }
 
 export default function Response({ response }: { response: ResponseMessage }) {
-  return (
+    return (
+        <div>
+            <ResponseGraph response={ response } />
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
             <TableCell />
-            <TableCell>Action</TableCell>
-            <TableCell>Final Answer</TableCell>
+            <TableCell>Role</TableCell>
+            <TableCell>Function Name</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {response?.openAIMessages?.map(
-            (row: { thought: React.Key | null | undefined }) => (
+          {response?.chatHistory?.map(
+            (row: { content: React.Key | null | undefined }) => (
               <Row row={row} />
             )
           )}
         </TableBody>
       </Table>
-    </TableContainer>
+            </TableContainer>
+    </div>
   );
 }
 
@@ -64,8 +72,8 @@ function Row(props: { row: any }) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell scope="row">{row.action}</TableCell>
-        <TableCell>{row.final_answer}</TableCell>
+        <TableCell scope="row">{row.role}</TableCell>
+        <TableCell>{row.functionName}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -74,15 +82,17 @@ function Row(props: { row: any }) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Thought</TableCell>
-                    <TableCell>Observation</TableCell>
-                    <TableCell>Original Response</TableCell>
+                    <TableCell>Role</TableCell>
+                    <TableCell>Content</TableCell>
+                    <TableCell>FunctionName</TableCell>
+                    <TableCell>FunctionArguments</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableCell scope="row">{row.thought}</TableCell>
-                  <TableCell>{row.observation}</TableCell>
-                  <TableCell>{row.original_response}</TableCell>
+                  <TableCell scope="row">{row.role}</TableCell>
+                  <TableCell>{row.content}</TableCell>
+                  <TableCell>{row.functionName}</TableCell>
+                  <TableCell>{row.functionArguments}</TableCell>
                 </TableBody>
               </Table>
             </Box>
