@@ -7,21 +7,24 @@ using Microsoft.SemanticKernel.Planning;
 //using Microsoft.SemanticKernel.Planning.Handlebars;
 using RecommendationApi.Models;
 using RecommendationApi.Plugins;
+using System.Text;
 using System.Text.Json;
 
 #pragma warning disable SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Services
 {
     public class RecommendationService
     {
         private readonly Kernel _kernel;
+        private readonly List<ChatHistoryItem> _chatHistoryFromEventHandler = new();
+        //private readonly ILogger _logger;
         //private readonly ISemanticTextMemory _memory;
 
-        public RecommendationService(Kernel kernel)
+        public RecommendationService(Kernel kernel)//, ILogger logger)
         {
             _kernel = kernel;
+            //_logger = logger;
             //_memory = kernel.GetRequiredService<ISemanticTextMemory>();
 
             //var historicalWeatherLookupPlugin = _kernel.CreatePluginFromType<HistoricalWeatherLookupPlugin>();
@@ -45,20 +48,7 @@ namespace RecommendationApi.Services
         {
             var username = "dkschrute";
             var currentDate = DateTime.Now.ToString("MMM-dd-yyyy");
-
-            //KernelPlugin relevantRecommendationFunctions = new ("Recommendation");
-            //var relevantFunctions = _memory.SearchAsync("functions", request.Message, 30, minRelevanceScore: 0.75);
-
-            //var historicalWeatherLookupPlugin = _kernel.CreatePluginFromType<HistoricalWeatherLookupPlugin>();
-
-            //await foreach(MemoryQueryResult relaventFunction in relevantFunctions)
-            //{
-            //    historicalWeatherLookupPlugin.TryGetFunction(relaventFunction.Metadata.AdditionalMetadata, out var function);
-            //    relevantRecommendationFunctions.AddFunction(function!);
-            //}
-
-            //var kernelWithRelevantFunctions = _kernel.Clone();
-            //kernelWithRelevantFunctions.Plugins.Add(relevantRecommendationFunctions);
+            _chatHistoryFromEventHandler.Clear();
 
             _kernel.PromptRendering += Kernel_PromptRendering;
             _kernel.PromptRendered += Kernel_PromptRendered;
@@ -68,11 +58,10 @@ namespace RecommendationApi.Services
             #region FunctionCallingStepwisePlanner
             var config = new FunctionCallingStepwisePlannerConfig
             {
-                //MaxIterations = 5,
                 ExecutionSettings = new OpenAIPromptExecutionSettings
                 {
-                    ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request {username}. The current date is {currentDate}. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
-                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+                    ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
+                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                    
                 }
                 
             };
@@ -80,11 +69,11 @@ namespace RecommendationApi.Services
             var planner = new FunctionCallingStepwisePlanner(config);
 
             FunctionCallingStepwisePlannerResult response = null;
-            Response returnValue = new Response();
+            Response returnValue = new();
 
             try
             {
-                response = await planner.ExecuteAsync(_kernel, request.Message);
+                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The user question is \"{request.Message}\"");
             }
             catch(Exception ex)
             {
@@ -97,7 +86,7 @@ namespace RecommendationApi.Services
             }
             else
             {
-                return ParseResponse(response);
+                return ParseResponse(response!);
             }
 
             #endregion
@@ -161,6 +150,15 @@ namespace RecommendationApi.Services
         private void Kernel_FunctionInvoked(object? sender, FunctionInvokedEventArgs e)
         {
             Console.WriteLine(e);
+            _chatHistoryFromEventHandler.Add(new ChatHistoryItem
+            {
+                Content = e.Result.ToString(),
+                PromptTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
+                CompletionTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.CompletionTokens ?? 0,
+                TotalTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
+                FunctionName = e.Function.Name,
+                FunctionArguments = string.Join(", ", e.Arguments)
+            });
         }
 
         private void Kernel_FunctionInvoking(object? sender, FunctionInvokingEventArgs e)
@@ -184,33 +182,45 @@ namespace RecommendationApi.Services
             {
                 Iterations = functionCallingStepwisePlannerResult.Iterations,
                 FinalAnswer = functionCallingStepwisePlannerResult.FinalAnswer,
-                ChatHistory = ParseChatHistory(functionCallingStepwisePlannerResult.ChatHistory)
+                ChatHistory = ParseChatHistory(functionCallingStepwisePlannerResult.ChatHistory!),
             };
 
             return response;
         }
 
-        private List<ChatHistoryItem> ParseChatHistory(ChatHistory? chatHistory)
+        private List<ChatHistoryItem> ParseChatHistory(ChatHistory chatHistory)
         {
             var chatHistoryItems = new List<ChatHistoryItem>();
+
+            foreach (var item in _chatHistoryFromEventHandler)
+            {
+                if (item.CompletionTokens > 0) {
+                    var newItem = item;
+                    newItem.Role = "assistant";
+                    chatHistoryItems.Add(item);
+                }
+            }
+
             foreach (var item in chatHistory)
             {
-                var chatHistoryItem = new ChatHistoryItem
+                if (item.Role != AuthorRole.User)
                 {
-                    Content = item.Content,
-                    Role = item.Role.Label,
-                    PromptTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
-                    CompletionTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.CompletionTokens ?? 0,
-                    TotalTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
-                    FunctionName = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Name ?? "",
-                    FunctionArguments = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Arguments ?? ""
+                    var chatHistoryItem = new ChatHistoryItem
+                    {
+                        Content = item.Content ?? "",
+                        Role = item.Role.Label,
+                        PromptTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
+                        CompletionTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.CompletionTokens ?? 0,
+                        TotalTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
+                        FunctionName = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Name ?? "",
+                        FunctionArguments = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Arguments ?? ""
                     };
-                chatHistoryItems.Add(chatHistoryItem);
+                    chatHistoryItems.Add(chatHistoryItem);
+                }
             }
             return chatHistoryItems;
-        }
+        }        
     }
 }
 #pragma warning restore SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-#pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

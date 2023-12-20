@@ -4,4 +4,7 @@
     <StartupCommand>
     </StartupCommand>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\components\NewFolder\" />
+  </ItemGroup>
 </Project>

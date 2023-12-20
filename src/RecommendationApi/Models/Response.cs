@@ -6,13 +6,14 @@ namespace RecommendationApi.Models
     {
         public int Iterations { get; init; }
         public List<ChatHistoryItem> ChatHistory { get; init; } = [];
+
         public string FinalAnswer { get; set; } = "";
     }
 
     public record ChatHistoryItem
     {
         public string Content { get; init; } = "";
-        public string Role { get; init; } = "";
+        public string Role { get; set; } = "";
         public int CompletionTokens { get; init; }
         public int PromptTokens { get; init; }
         public int TotalTokens { get; init; }
