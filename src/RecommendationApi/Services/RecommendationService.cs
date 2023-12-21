@@ -188,18 +188,18 @@ namespace RecommendationApi.Services
             return response;
         }
 
-        private List<ChatHistoryItem> ParseChatHistory(ChatHistory chatHistory)
+        private static List<ChatHistoryItem> ParseChatHistory(ChatHistory chatHistory)
         {
             var chatHistoryItems = new List<ChatHistoryItem>();
 
-            foreach (var item in _chatHistoryFromEventHandler)
-            {
-                if (item.CompletionTokens > 0) {
-                    var newItem = item;
-                    newItem.Role = "assistant";
-                    chatHistoryItems.Add(item);
-                }
-            }
+            //foreach (var item in _chatHistoryFromEventHandler)
+            //{
+            //    if (item.CompletionTokens > 0) {
+            //        var newItem = item;
+            //        newItem.Role = "assistant";
+            //        chatHistoryItems.Add(item);
+            //    }
+            //}
 
             foreach (var item in chatHistory)
             {

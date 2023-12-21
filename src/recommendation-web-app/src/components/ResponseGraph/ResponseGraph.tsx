@@ -49,18 +49,16 @@ function ConvertToMermaidDiagram(response: ResponseMessage) {
 
     response.chatHistory.forEach((message, index, chatHistory) => {
         if (message.role === "system") {
-            chatMessages += `    OpenAI->>WebApp: ${addNewLineAt80Characters(`${message.role} - ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
-            if (message.totalTokens > 0) {
-                chatMessages += `    Note right of WebApp: P:${message.promptTokens}/C:${message.completionTokens}/T:${message.totalTokens}\n`
-            }
+            chatMessages += `    WebApp->>OpenAI: ${addNewLineAt80Characters(`${message.role} - ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>').trimEnd()}`)}\n`;
         }
 
         if (message.role === "assistant") {
             if (message.functionName != "") {
-                chatMessages += `    WebApp->>+${message.functionName}: ${addNewLineAt80Characters(`${message.role} - ${message.functionArguments.replace(/(?:\r\n|\r|\n)/g, '')}`)}\n`;
+                chatMessages += `    OpenAI->>WebApp: ${addNewLineAt80Characters(`${message.role} - ${message.functionName} - ${message.functionArguments.replace(/(?:\r\n|\r|\n)/g, '')}`)}\n`;
                 if (message.totalTokens > 0) {
-                    chatMessages += `    Note right of ${message.functionName}: P:${message.promptTokens}/C:${message.completionTokens}/T:${message.totalTokens}\n`
+                    chatMessages += `    Note left of OpenAI: P:${message.promptTokens}/C:${message.completionTokens}/T:${message.totalTokens}\n`
                 }
+                chatMessages += `    WebApp->>+${message.functionName}: ${addNewLineAt80Characters(`${message.role} - ${message.functionArguments.replace(/(?:\r\n|\r|\n)/g, '')}`)}\n`;
             }
             else {
                 chatMessages += `    WebApp->>OpenAI: ${addNewLineAt80Characters(`${message.role} - ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
@@ -72,16 +70,11 @@ function ConvertToMermaidDiagram(response: ResponseMessage) {
 
         if (message.role === "user") {
             chatMessages += `    WebApp->>WebApp: ${addNewLineAt80Characters(`${message.role} - ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
-            if (message.totalTokens > 0) {
-                chatMessages += `    Note right of WebApp: P:${message.promptTokens}/C:${message.completionTokens}/T:${message.totalTokens}\n`
-            }
         }
 
         if (message.role === "tool") {
-            chatMessages += `    ${chatHistory[index - 1].functionName}->>-OpenAI: ${addNewLineAt80Characters(`${message.role} - ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
-            if (message.totalTokens > 0) {
-                chatMessages += `    Note right of OpenAI: P:${message.promptTokens}/C:${message.completionTokens}/T:${message.totalTokens}\n`
-            }
+            chatMessages += `    ${chatHistory[index - 1].functionName}->>-WebApp: ${addNewLineAt80Characters(`${message.role} - ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
+            chatMessages += `    WebApp->>OpenAI: ${addNewLineAt80Characters(`${message.role} - ${chatHistory[index - 1].functionName} ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
         }
     }
     );

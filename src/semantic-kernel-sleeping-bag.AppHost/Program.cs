@@ -6,34 +6,29 @@ var appInsightsConnectionString = builder.Configuration["ApplicationInsights:Con
 
 builder.AddDapr();
 
-var historicalWeatherLookup = builder.AddProject<Projects.HistoricalWeatherLookup>("historicalWeatherLookup")
+var historicalWeatherLookup = builder.AddProject<Projects.HistoricalWeatherLookup>("historical-weather-lookup")
     .WithEnvironment("ApplicationInsights:ConnectionString", appInsightsConnectionString)
-    .WithDaprSidecar("historical-weather-lookup")
-    .WithServiceBinding(hostPort: 53558);
+    .WithDaprSidecar();
 
-var locationLookup = builder.AddProject<Projects.LocationLookup>("locationLookup")
+var locationLookup = builder.AddProject<Projects.LocationLookup>("location-lookup")
     .WithEnvironment("ApplicationInsights:ConnectionString", appInsightsConnectionString)
-    .WithDaprSidecar("location-lookup")
-    .WithServiceBinding(hostPort: 53560);
+    .WithDaprSidecar();
 
-var orderHistory = builder.AddProject<Projects.OrderHistory>("orderHistory")
+var orderHistory = builder.AddProject<Projects.OrderHistory>("order-history")
     .WithEnvironment("ApplicationInsights:ConnectionString", appInsightsConnectionString)
-    .WithDaprSidecar("order-history")
-    .WithServiceBinding(hostPort: 53562);
+    .WithDaprSidecar();
 
-var productCatalog = builder.AddProject<Projects.ProductCatalog>("productCatalog")
+var productCatalog = builder.AddProject<Projects.ProductCatalog>("product-catalog")
     .WithEnvironment("ApplicationInsights:ConnectionString", appInsightsConnectionString)
-    .WithDaprSidecar("product-catalog")
-    .WithServiceBinding(hostPort: 53564);
+    .WithDaprSidecar();
 
-var recommendationApi = builder.AddProject<Projects.RecommendationApi>("recommendationApi")
+var recommendationApi = builder.AddProject<Projects.RecommendationApi>("recommendation-api")
     .WithEnvironment("ApplicationInsights:ConnectionString", appInsightsConnectionString)
     .WithReference(historicalWeatherLookup)
     .WithReference(locationLookup)
     .WithReference(orderHistory)
     .WithReference(productCatalog)
-    .WithDaprSidecar("recommendation-api")
-    .WithServiceBinding(hostPort: 53566);
+    .WithDaprSidecar();
 
 //var recommendationWebApp = builder.AddNpmApp("recommendation-web-app", "../recommendation-web-app", "start")
 //    .WithReference(recommendationApi)
