@@ -1,12 +1,16 @@
 import * as React from "react";
-import { ResponseMessage } from "../Response/Response";
 import mermaid from "mermaid";
+import { ResponseMessage } from "../../@types/ResponseMessage";
 
 mermaid.initialize({
   startOnLoad: true,
 });
 
-export default function ResponseGraph({ response }: { response: ResponseMessage }) {
+interface ResponseGraphProps {
+    response: ResponseMessage | undefined
+}
+
+export default function ResponseGraph({ response }: ResponseGraphProps) {
     let data = ConvertToMermaidDiagram(response);
 
     React.useEffect(() => {
@@ -21,14 +25,14 @@ export default function ResponseGraph({ response }: { response: ResponseMessage 
   );
 }
 
-function ConvertToMermaidDiagram(response: ResponseMessage) {
+function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
     let chatMessages = "";
     let pluginFunctionNames: Set<string> = new Set<string>();
     let semanticFunctionNames: Set<string> = new Set<string>();
     let pluginFunctions = "";
     let semanticFunctions = "";
 
-    response.chatHistory.forEach((message) => {
+    response?.chatHistory.forEach((message) => {
         if((message.role === "assistant" && message.functionName !== "" && !message.functionName.includes("_")) || message.functionName === "UserInteraction_SendFinalAnswer") {
             semanticFunctionNames.add(message.functionName);
         }
@@ -47,7 +51,7 @@ function ConvertToMermaidDiagram(response: ResponseMessage) {
         semanticFunctions += `    participant ${functionName}\n`;
     });
 
-    response.chatHistory.forEach((message, index, chatHistory) => {
+    response?.chatHistory.forEach((message, index, chatHistory) => {
         if (message.role === "system") {
             chatMessages += `    OpenAI->>WebApp: ${addNewLineAt80Characters(`${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>').trimEnd()}`)}\n`;
             chatMessages += `    Note over OpenAI,WebApp: ${message.role}\n`

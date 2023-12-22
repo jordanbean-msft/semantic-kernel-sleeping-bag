@@ -4,7 +4,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import Request from "./Request/Request";
+import ChatWindow from "../ChatWindow/ChatWindow";
 
 const pages = ["Chatbot"];
 const settings = ["Profile", "Logout"];
@@ -63,7 +63,7 @@ function ResponsiveAppBar() {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <Request />
+            <ChatWindow />
         </Container>
     );
 }

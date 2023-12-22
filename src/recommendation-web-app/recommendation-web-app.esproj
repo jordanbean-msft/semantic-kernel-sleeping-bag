@@ -5,6 +5,6 @@
     </StartupCommand>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\components\NewFolder\" />
+    <Folder Include="src\components\ChatWindow\" />
   </ItemGroup>
 </Project>

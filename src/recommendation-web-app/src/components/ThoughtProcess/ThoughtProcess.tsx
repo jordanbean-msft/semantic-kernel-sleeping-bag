@@ -1,4 +1,3 @@
-import { useState } from "react";
 import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -14,24 +13,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import ResponseGraph from "../ResponseGraph/ResponseGraph";
 import Container from "@mui/material/Container";
+import { ResponseMessage } from "../../@types/ResponseMessage";
 
-export interface OpenAIMessage {
-    content: string;
-    role: string;
-    functionName: string;
-    functionArguments: string;
-    completionTokens: number;
-    promptTokens: number;
-    totalTokens: number;
+interface ThoughtProcessProps {
+    response: ResponseMessage | undefined;
 }
 
-export interface ResponseMessage {
-    iterations: number;
-    chatHistory: Array<OpenAIMessage>;
-    finalAnswer: string;
-}
-
-export default function Response({ response }: { response: ResponseMessage }) {
+export default function ThoughtProcess({ response }: ThoughtProcessProps) {
     return (
         <div>
             <Container maxWidth={false}>
