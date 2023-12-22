@@ -21,8 +21,8 @@ export default function ChatWindow() {
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const isFirstTime = chatHistory.length === 0;
-    const [request, setRequest] = useState(isFirstTime ? "Will my sleeping bag work for my trip to Patagonia next month?" : "");
+    const [isFirstTime, setIsFirstTime] = useState(true);
+    const [request, setRequest] = useState("Will my sleeping bag work for my trip to Patagonia next month?");
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
@@ -38,7 +38,7 @@ export default function ChatWindow() {
                     </TabList>
                 </Box>
                 <TabPanel value="0">
-                    <Grid container spacing={2}>
+                    <Grid container spacing={6}>
                         <Grid item xs={12}>
                             <ChatThread chatHistory={chatHistory} />
                         </Grid>
@@ -54,15 +54,18 @@ export default function ChatWindow() {
         </Box>
     )
     async function handleSubmit() {
-        if (!loading) {
+        if (!loading && request !== "") {
             setSuccess(false);
             setLoading(true);
             setResponseMessage(undefined);
+            setIsFirstTime(false);
+
             let chatHistoryItem: ChatHistoryItem = {
                 content: request,
                 role: "user"
             };
             setChatHistory(chatHistory => ([...chatHistory, chatHistoryItem]));
+            setRequest("");
 
             let response = await callApi();
 
@@ -70,6 +73,7 @@ export default function ChatWindow() {
                 content: response.finalAnswer,
                 role: "assistant"
             };
+
             setChatHistory(chatHistory => ([...chatHistory, chatHistoryItemResponse]));
             setResponseMessage(response);
             setSuccess(true);
@@ -85,7 +89,7 @@ export default function ChatWindow() {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message: request }),
+            body: JSON.stringify({ message: request, chatHistory: chatHistory }),
         }).then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

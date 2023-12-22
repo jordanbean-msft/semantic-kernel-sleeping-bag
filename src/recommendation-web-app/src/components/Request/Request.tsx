@@ -4,8 +4,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import { green } from "@mui/material/colors";
-import { useState } from "react";
 import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
 
 interface RequestProps {
     request: string,
@@ -15,7 +15,7 @@ interface RequestProps {
     handleSubmit: () => void
 }
 
-export default function Request({ request, success, loading, setRequest, handleSubmit }: RequestProps){
+export default function Request({ request, success, loading, setRequest, handleSubmit }: RequestProps) {
     const buttonSx = {
         ...(success && {
             bgcolor: green[500],
@@ -26,8 +26,8 @@ export default function Request({ request, success, loading, setRequest, handleS
     };
 
     return (
-        <Stack>
-                <TextField
+        <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} >
+        <TextField
                     id="request"
                     label="Request"
                     variant="outlined"
