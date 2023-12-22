@@ -73,7 +73,7 @@ namespace RecommendationApi.Services
 
             try
             {
-                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory)}\". The user question is \"{request.Message}\"");
+                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}\". The user question is \"{request.Message}\"");
             }
             catch(Exception ex)
             {
