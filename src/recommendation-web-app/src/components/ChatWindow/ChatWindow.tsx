@@ -12,11 +12,12 @@ import ChatThread from '../ChatThread/ChatThread';
 import Request from '../Request/Request';
 import Grid from '@mui/material/Grid';
 import { ChatHistoryItem } from '../../@types/ChatHistoryItem';
+import { OpenAIMessage } from '../../@types/OpenAIMessage';
 
 export default function ChatWindow() {
     const [value, setValue] = React.useState("0");
     const [responseMessage, setResponseMessage] = useState<ResponseMessage | undefined>(undefined);
-
+    const [entireChatHistory, setEntireChatHistory] = useState<Array<OpenAIMessage>>([]);
     const [chatHistory, setChatHistory] = useState<Array<ChatHistoryItem>>([]);
 
     const [loading, setLoading] = useState(false);
@@ -75,6 +76,7 @@ export default function ChatWindow() {
             };
 
             setChatHistory(chatHistory => ([...chatHistory, chatHistoryItemResponse]));
+            setEntireChatHistory(entireChatHistory => ([...entireChatHistory, ...response.chatHistory]));
             setResponseMessage(response);
             setSuccess(true);
             setLoading(false);
@@ -89,7 +91,7 @@ export default function ChatWindow() {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message: request, chatHistory: chatHistory }),
+            body: JSON.stringify({ message: request, chatHistory: entireChatHistory }),
         }).then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

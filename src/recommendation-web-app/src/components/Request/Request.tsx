@@ -47,7 +47,7 @@ export default function Request({ request, success, loading, setRequest, handleS
                                 position: "absolute",
                                 top: "50%",
                                 left: "50%",
-                                marginTop: "-12px",
+                                marginTop: "-20px",
                                 marginLeft: "-12px",
                             }}
                         />
