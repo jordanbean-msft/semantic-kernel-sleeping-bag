@@ -5,14 +5,20 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import ChatWindow from "../ChatWindow/ChatWindow";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import RestartAlt from "@mui/icons-material/RestartAlt";
+import { useState } from "react";
 
 const pages = ["Chatbot"];
 const settings = ["Profile", "Logout"];
 
 function ResponsiveAppBar() {
-    const [anchorElNav, setAnchorElNav] = React.useState(null);
-    const [anchorElUser, setAnchorElUser] = React.useState(null);
-    const [loggedIn, setLoggedIn] = React.useState(false);
+    const [anchorElNav, setAnchorElNav] = useState(null);
+    const [anchorElUser, setAnchorElUser] = useState(null);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [reset, setReset] = useState(false);
 
     const handleOpenNavMenu = (event: {
         currentTarget: React.SetStateAction<null>;
@@ -34,7 +40,8 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <Container maxWidth={false}>
+        <Stack spacing={2}>
+        <Box>
             <AppBar position="static">
                 <Container maxWidth={false}>
                     <Toolbar disableGutters>
@@ -57,14 +64,19 @@ function ResponsiveAppBar() {
                         >
                             Contoso Retail Chatbot
                         </Typography>
-                        <Typography variant="h6" noWrap>
+                        <Typography variant="h6" noWrap sx={{ mr: 1 }}>
                             (with Azure OpenAI & Semantic Kernel)
                         </Typography>
+                        <Box sx={{ flexGrow: 1 }} />
+                        <Button color="inherit" onClick={() => setReset(true)} endIcon={<RestartAlt />}>Restart</Button>
                     </Toolbar>
                 </Container>
-            </AppBar>
-            <ChatWindow />
-        </Container>
+                </AppBar>
+            </Box>
+            <Box padding={2}>
+                <ChatWindow reset={reset} setReset={setReset} />
+            </Box>
+        </Stack>
     );
 }
 export default ResponsiveAppBar;

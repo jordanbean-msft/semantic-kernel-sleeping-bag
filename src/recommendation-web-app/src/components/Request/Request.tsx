@@ -1,14 +1,12 @@
 import TextField from "@mui/material/TextField";
 import "./Request.css";
 import Button from "@mui/material/Button";
-import { green } from "@mui/material/colors";
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
 import PersonIcon from "@mui/icons-material/Person";
 import Send from "@mui/icons-material/Send";
-import RestartAlt from "@mui/icons-material/RestartAlt";
 import { Psychology } from "@mui/icons-material";
 
 interface RequestProps {
@@ -17,11 +15,10 @@ interface RequestProps {
     loading: boolean,
     setRequest: (value: string) => void,
     handleSubmit: () => void,
-    reset: () => void,
     handleClickOpen: () => void
 }
 
-export default function Request({ request, success, loading, setRequest, handleSubmit, reset, handleClickOpen }: RequestProps) {
+export default function Request({ request, success, loading, setRequest, handleSubmit, handleClickOpen }: RequestProps) {
     return (
         <Grid
             container
@@ -53,14 +50,11 @@ export default function Request({ request, success, loading, setRequest, handleS
                         </Grid>
                     </Grid>
                     <Stack spacing={2} >
+                        <Button variant="contained" disabled={success} onClick={handleClickOpen} endIcon={<Psychology />}>
+                            Thought Process
+                        </Button>
                         <Button variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
                             Submit
-                        </Button>
-                        <Button variant="contained" onClick={reset} endIcon={<RestartAlt />}>
-                            Restart
-                        </Button>
-                        <Button variant="contained" onClick={handleClickOpen} endIcon={<Psychology />}>
-                            Thought Process
                         </Button>
                     </Stack>
                 </Stack>

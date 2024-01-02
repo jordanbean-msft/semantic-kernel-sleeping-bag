@@ -1,10 +1,5 @@
 import * as React from 'react';
-import { useState } from "react";
-import Tab from '@mui/material/Tab';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import TabContext from '@mui/lab/TabContext';
-import Box from '@mui/material/Box'
+import { useEffect, useState } from "react";
 import ThoughtProcess from '../ThoughtProcess/ThoughtProcess';
 import config from '../../config';
 import { ResponseMessage } from '../../@types/ResponseMessage';
@@ -21,6 +16,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -31,7 +27,12 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function ChatWindow() {
+interface ChatWindowProps {
+    reset: boolean;
+    setReset: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
     const defaultMessage = "Will my sleeping bag work for my trip to Patagonia next month?";
 
     const [value, setValue] = React.useState("0");
@@ -44,9 +45,15 @@ export default function ChatWindow() {
     const [request, setRequest] = useState(defaultMessage);
     const [open, setOpen] = React.useState(false);
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-        setValue(newValue);
-    }
+    useEffect(() => {
+        if (reset) {
+            setChatHistory([]);
+            setEntireChatHistory([]);
+            setRequest(defaultMessage);
+            setResponseMessage(undefined);
+            setSuccess(false);
+        }
+    });
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -56,13 +63,6 @@ export default function ChatWindow() {
         setOpen(false);
     };
 
-    function reset() {
-        setChatHistory([]);
-        setEntireChatHistory([]);
-        setRequest(defaultMessage);
-        setResponseMessage(undefined);
-    }
-
     return (
         <React.Fragment>
             <Grid container spacing={6}>
@@ -70,7 +70,7 @@ export default function ChatWindow() {
                     <ChatThread chatHistory={chatHistory} loading={loading} />
                 </Grid>
                 <Grid item xs={12}>
-                    <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} reset={reset} handleClickOpen={handleClickOpen } />
+                    <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} handleClickOpen={handleClickOpen} />
                 </Grid>
             </Grid>
             <Dialog
@@ -81,6 +81,10 @@ export default function ChatWindow() {
             >
                 <AppBar sx={{ position: 'relative' }}>
                     <Toolbar>
+                        <PsychologyIcon />
+                        <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+                            Thought Process
+                        </Typography>
                         <IconButton
                             edge="start"
                             color="inherit"
@@ -89,9 +93,6 @@ export default function ChatWindow() {
                         >
                             <CloseIcon />
                         </IconButton>
-                        <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            Thought Process
-                        </Typography>
                     </Toolbar>
                 </AppBar>
                 <ThoughtProcess response={responseMessage} />
