@@ -22,7 +22,6 @@ export default function ChatWindow() {
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [isFirstTime, setIsFirstTime] = useState(true);
     const [request, setRequest] = useState("Will my sleeping bag work for my trip to Patagonia next month?");
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -59,7 +58,6 @@ export default function ChatWindow() {
             setSuccess(false);
             setLoading(true);
             setResponseMessage(undefined);
-            setIsFirstTime(false);
 
             let chatHistoryItem: ChatHistoryItem = {
                 content: request,
