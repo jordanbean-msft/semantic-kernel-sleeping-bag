@@ -50,7 +50,7 @@ export default function Request({ request, success, loading, setRequest, handleS
                         </Grid>
                     </Grid>
                     <Stack spacing={2} >
-                        <Button variant="contained" disabled={success} onClick={handleClickOpen} endIcon={<Psychology />}>
+                        <Button variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
                             Thought Process
                         </Button>
                         <Button variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
