@@ -24,7 +24,7 @@ export default function ChatThread({ chatHistory, loading }: ChatThreadProps) {
                             <ChatThreadItem
                                 avatar={<PersonIcon />}
                                 item={
-                                    <Typography>{chatHistoryItem.content}</Typography>
+                                    <Typography align="left">{chatHistoryItem.content}</Typography>
                                 }
                                 isUserRole={true} />
                                                     )
@@ -36,7 +36,7 @@ export default function ChatThread({ chatHistory, loading }: ChatThreadProps) {
                                     <SmartToyIcon />
                                 }
                                 item={
-                                    <Typography>{chatHistoryItem.content}</Typography>
+                                    <Typography align="left">{chatHistoryItem.content}</Typography>
                                 }
                                 isUserRole={
                                     false

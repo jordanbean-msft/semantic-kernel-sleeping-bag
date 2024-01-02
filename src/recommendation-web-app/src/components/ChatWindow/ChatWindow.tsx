@@ -35,7 +35,6 @@ interface ChatWindowProps {
 export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
     const defaultMessage = "Will my sleeping bag work for my trip to Patagonia next month?";
 
-    const [value, setValue] = React.useState("0");
     const [responseMessage, setResponseMessage] = useState<ResponseMessage | undefined>(undefined);
     const [entireChatHistory, setEntireChatHistory] = useState<Array<OpenAIMessage>>([]);
     const [chatHistory, setChatHistory] = useState<Array<ChatHistoryItem>>([]);
@@ -52,6 +51,8 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
             setRequest(defaultMessage);
             setResponseMessage(undefined);
             setSuccess(false);
+            setLoading(false);
+            setReset(false);
         }
     });
 
