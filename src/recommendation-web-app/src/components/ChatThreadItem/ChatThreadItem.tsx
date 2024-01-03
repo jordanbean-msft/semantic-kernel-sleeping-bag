@@ -1,4 +1,5 @@
 import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import { SvgIconProps } from "@mui/material/SvgIcon";
@@ -12,40 +13,56 @@ interface ChatThreadItemProps {
 
 export default function ChatThreadItem({ avatar, item, isUserRole }: ChatThreadItemProps) {
     return (
-        <Grid item xs={12}>
-            <Grid container>
+        <Paper elevation={12}>
+            <Box sx={{
+                display: "flex",
+                p: 2,
+                maxWidth: 1000
+            }}>
+                <Avatar>
+                    {
+                        avatar
+                    }
+                </Avatar>
                 {
-                    isUserRole ? (
-                        <div />
-                    ) : (
-                        <Grid item xs={6} />
-                    )
+                    item
                 }
-                <Grid item zeroMinWidth xs={6} >
-                    <Paper>
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={1}>
-                                <Avatar>
-                                    {
-                                        avatar
-                                    }
-                                </Avatar>
-                            </Grid>
-                            <Grid item xs={11}>
-                                {
-                                    item
-                                }
-                            </Grid>
-                        </Grid>
-                    </Paper>
-                </Grid>
-                {
-                    isUserRole ? (
-                        <Grid item xs={6} />
-                    ) : (
-                        <div />
-                    )
-                }                </Grid>
-        </Grid>
+            </Box>
+        </Paper>
+        //<Grid item xs={12}>
+        //    <Grid container>
+        //        {
+        //            isUserRole ? (
+        //                <div />
+        //            ) : (
+        //                <Grid item xs={6} />
+        //            )
+        //        }
+        //        <Grid item xs={6}>
+        //            <Paper elevation={12} >
+        //                <Grid container spacing={2} wrap="nowrap">
+        //                    <Grid item>
+        //                        <Avatar>
+        //                            {
+        //                                avatar
+        //                            }
+        //                        </Avatar>
+        //                    </Grid>
+        //                    <Grid item xs>
+        //                        {
+        //                            item
+        //                        }
+        //                    </Grid>
+        //                </Grid>
+        //            </Paper>
+        //        </Grid>
+        //        {
+        //            isUserRole ? (
+        //                <Grid item xs={6} />
+        //            ) : (
+        //                <div />
+        //            )
+        //        }                </Grid>
+        //</Grid>
     );
 }

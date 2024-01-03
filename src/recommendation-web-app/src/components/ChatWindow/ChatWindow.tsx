@@ -17,6 +17,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import Box from '@mui/material/Box';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -66,14 +67,20 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
 
     return (
         <React.Fragment>
-            <Grid container spacing={6}>
-                <Grid item xs={12}>
-                    <ChatThread chatHistory={chatHistory} loading={loading} />
-                </Grid>
-                <Grid item xs={12}>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <ChatThread chatHistory={chatHistory} loading={loading} />
+                <Box sx={{ p: 2 }} >
                     <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} handleClickOpen={handleClickOpen} />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
+            {/*<Grid container spacing={6}>*/}
+            {/*    <Grid item xs={12}>*/}
+            {/*        <ChatThread chatHistory={chatHistory} loading={loading} />*/}
+            {/*    </Grid>*/}
+            {/*    <Grid item xs={12}>*/}
+            {/*        <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} handleClickOpen={handleClickOpen} />*/}
+            {/*    </Grid>*/}
+            {/*</Grid>*/}
             <Dialog
                 fullScreen
                 open={open}

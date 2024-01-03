@@ -8,6 +8,8 @@ import Grid from "@mui/material/Grid";
 import PersonIcon from "@mui/icons-material/Person";
 import Send from "@mui/icons-material/Send";
 import { Psychology } from "@mui/icons-material";
+import React from "react";
+import Paper from "@mui/material/Paper";
 
 interface RequestProps {
     request: string,
@@ -20,45 +22,74 @@ interface RequestProps {
 
 export default function Request({ request, success, loading, setRequest, handleSubmit, handleClickOpen }: RequestProps) {
     return (
-        <Grid
-            container
-            spacing={1} >
-            <Grid item xs={12}>
-                <Stack
-                    direction="row"
-                    divider={<Divider orientation="vertical" flexItem />}
-                    spacing={2}
-                    justifyContent="space-between">
-                    <Grid container alignItems="flex-end" spacing={2}>
-                        <Grid item sm>
-                            <Avatar>
-                                <PersonIcon />
-                            </Avatar>
-                        </Grid>
-                        <Grid item xs={11}>
-                            <TextField
-                                id="request"
-                                label="Request"
-                                variant="outlined"
-                                value={request}
-                                onChange={(e) => setRequest(e.target.value.replace(/\n/g, ''))}
-                                fullWidth
-                                onKeyDown={(e) => (
-                                    e.code === "Enter" ? handleSubmit() : null
-                                )}
-                            />
-                        </Grid>
-                    </Grid>
-                    <Stack spacing={2} >
-                        <Button variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
-                            Thought Process
-                        </Button>
-                        <Button variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
-                            Submit
-                        </Button>
-                    </Stack>
+        <Grid container spacing={2}>
+            <Grid item xs={10}>
+                <Stack spacing={2}>
+                    <TextField size="small" sx={{ visibility: "hidden" }} />
+                <TextField
+                    size="small"
+                    id="request"
+                    label="Request"
+                    variant="outlined"
+                    value={request}
+                    onChange={(e) => setRequest(e.target.value.replace(/\n/g, ''))}
+                    fullWidth
+                    onKeyDown={(e) => (
+                        e.code === "Enter" ? handleSubmit() : null
+                    )}
+                />
                 </Stack>
             </Grid>
+            <Grid item xs={2}>
+                <Stack spacing={2} >
+                                <Button variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
+                                    Thought Process
+                                </Button>
+                                <Button variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
+                                    Submit
+                                </Button>
+                            </Stack>
+                </Grid>
         </Grid>
+        //<Grid
+        //    container
+        //    spacing={1} >
+        //    <Grid item xs={12}>
+        //        <Stack
+        //            direction="row"
+        //            divider={<Divider orientation="vertical" flexItem />}
+        //            spacing={2}
+        //            justifyContent="space-between">
+        //            <Grid container alignItems="flex-end" spacing={2}>
+        //                <Grid item sm>
+        //                    <Avatar>
+        //                        <PersonIcon />
+        //                    </Avatar>
+        //                </Grid>
+        //                <Grid item xs={11}>
+        //                    <TextField
+        //                        id="request"
+        //                        label="Request"
+        //                        variant="outlined"
+        //                        value={request}
+        //                        onChange={(e) => setRequest(e.target.value.replace(/\n/g, ''))}
+        //                        fullWidth
+        //                        onKeyDown={(e) => (
+        //                            e.code === "Enter" ? handleSubmit() : null
+        //                        )}
+        //                    />
+        //                </Grid>
+        //            </Grid>
+        //            <Stack spacing={2} >
+        //                <Button variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
+        //                    Thought Process
+        //                </Button>
+        //                <Button variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
+        //                    Submit
+        //                </Button>
+        //            </Stack>
+        //        </Stack>
+        //    </Grid>
+        //</Grid>
     );
 }
