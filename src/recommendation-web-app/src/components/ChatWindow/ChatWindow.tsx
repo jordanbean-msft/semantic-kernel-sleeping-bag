@@ -5,7 +5,6 @@ import config from '../../config';
 import { ResponseMessage } from '../../@types/ResponseMessage';
 import ChatThread from '../ChatThread/ChatThread';
 import Request from '../Request/Request';
-import Grid from '@mui/material/Grid';
 import { ChatHistoryItem } from '../../@types/ChatHistoryItem';
 import { OpenAIMessage } from '../../@types/OpenAIMessage';
 import Dialog from '@mui/material/Dialog';
@@ -73,14 +72,6 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
                     <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} handleClickOpen={handleClickOpen} />
                 </Box>
             </Box>
-            {/*<Grid container spacing={6}>*/}
-            {/*    <Grid item xs={12}>*/}
-            {/*        <ChatThread chatHistory={chatHistory} loading={loading} />*/}
-            {/*    </Grid>*/}
-            {/*    <Grid item xs={12}>*/}
-            {/*        <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} handleClickOpen={handleClickOpen} />*/}
-            {/*    </Grid>*/}
-            {/*</Grid>*/}
             <Dialog
                 fullScreen
                 open={open}
