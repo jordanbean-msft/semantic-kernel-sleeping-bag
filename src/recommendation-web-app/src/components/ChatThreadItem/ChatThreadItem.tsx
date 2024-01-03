@@ -1,16 +1,16 @@
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import { SvgIconProps } from "@mui/material/SvgIcon";
-import { ReactElement } from "react";
+import Typography from "@mui/material/Typography";
+import PersonIcon from "@mui/icons-material/Person";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
 
 interface ChatThreadItemProps {
-    avatar: ReactElement<SvgIconProps>;
-    item: ReactElement;
+    content: string;
     isUserRole: boolean;
 }
 
-export default function ChatThreadItem({ avatar, item, isUserRole }: ChatThreadItemProps) {
+export default function ChatThreadItem({ content, isUserRole }: ChatThreadItemProps) {
     return (
         <Paper elevation={12}>
             <Box sx={{
@@ -20,12 +20,14 @@ export default function ChatThreadItem({ avatar, item, isUserRole }: ChatThreadI
             }}>
                 <Avatar>
                     {
-                        avatar
+                        isUserRole ? (
+                            <PersonIcon />
+                        ) : (
+                            <SmartToyIcon />
+                        )
                     }
                 </Avatar>
-                {
-                    item
-                }
+                <Typography align="left" sx={{ p: 1 }}>{content}</Typography>
             </Box>
         </Paper>
     );

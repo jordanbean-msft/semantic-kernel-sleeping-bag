@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Send from "@mui/icons-material/Send";
 import { Psychology } from "@mui/icons-material";
+import Typography from "@mui/material/Typography";
 
 interface RequestProps {
     request: string,
@@ -18,9 +19,7 @@ interface RequestProps {
 export default function Request({ request, success, loading, setRequest, handleSubmit, handleClickOpen }: RequestProps) {
     return (
         <Grid container spacing={2}>
-            <Grid item xs={10}>
-                <Stack spacing={2}>
-                    <TextField size="small" sx={{ visibility: "hidden" }} />
+            <Grid item xs={9}>
                 <TextField
                     size="small"
                     id="request"
@@ -33,18 +32,17 @@ export default function Request({ request, success, loading, setRequest, handleS
                         e.code === "Enter" ? handleSubmit() : null
                     )}
                 />
+            </Grid>
+            <Grid item xs={3 }>
+                <Stack direction="row" spacing={2} >
+                    <Button fullWidth variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
+                        <Typography>Submit</Typography>
+                    </Button>
+                    <Button fullWidth variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
+                        <Typography>Thought Process</Typography>
+                    </Button>
                 </Stack>
             </Grid>
-            <Grid item xs={2}>
-                <Stack spacing={2} >
-                                <Button variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
-                                    Thought Process
-                                </Button>
-                                <Button variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
-                                    Submit
-                                </Button>
-                            </Stack>
-                </Grid>
         </Grid>
     );
 }

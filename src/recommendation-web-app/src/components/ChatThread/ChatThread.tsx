@@ -1,11 +1,9 @@
 import { ChatHistoryItem } from "../../@types/ChatHistoryItem"
-import Typography from "@mui/material/Typography"
-import SmartToyIcon from "@mui/icons-material/SmartToy"
-import PersonIcon from "@mui/icons-material/Person"
 import Skeleton from "@mui/material/Skeleton"
 import ChatThreadItem from "../ChatThreadItem/ChatThreadItem"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
+import Paper from "@mui/material/Paper"
 
 interface ChatThreadProps {
     chatHistory: Array<ChatHistoryItem>,
@@ -14,26 +12,18 @@ interface ChatThreadProps {
 
 export default function ChatThread({ chatHistory, loading }: ChatThreadProps) {
     return (
-        <Box sx={{ flexGrod: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ flexGrow: 1, overflow: "auto", p: 2 }}>
             {
                 chatHistory.map((chatHistoryItem) => (
                     <Box sx={{
                         display: "flex",
                         justifyContent: chatHistoryItem.role === "user" ? "flex-start" : "flex-end",
-                        mb: 2                   
-                    }}>
+                        mb: 2
+                    }} key={chatHistoryItem.id}>
                         <ChatThreadItem
-                            avatar={
-                                chatHistoryItem.role === "user" ? (
-                                    <PersonIcon />
-                                ) : (
-                                    <SmartToyIcon />
-                                )
-                            }
-                            item={
-                                <Typography align="left" sx={{ p:1 }}>{chatHistoryItem.content}</Typography>
-                            }
-                            isUserRole={chatHistoryItem.role === "user" ? true : false} />
+                            content={chatHistoryItem.content}
+                            isUserRole={chatHistoryItem.role === "user" ? true : false}
+                        />
                     </Box>
                 ))
             }
@@ -44,16 +34,20 @@ export default function ChatThread({ chatHistory, loading }: ChatThreadProps) {
                         justifyContent: "flex-end",
                         mb: 2
                     }}>
-                        <ChatThreadItem
-                            avatar={<Skeleton variant="circular" />}
-                            item={
-                                <Stack spacing={1} sx={{ p:1 }}>
+                        <Paper elevation={12}>
+                            <Box sx={{
+                                display: "flex",
+                                p: 2,
+                                maxWidth: 1000
+                            }}>
+                                <Skeleton variant="circular" />
+                                <Stack spacing={1} sx={{ p: 1 }}>
                                     <Skeleton sx={{ width: 500 }} />
                                     <Skeleton />
                                     <Skeleton />
                                 </Stack>
-                            }
-                            isUserRole={false} />
+                            </Box>
+                        </Paper>
                     </Box>
                 )
             }

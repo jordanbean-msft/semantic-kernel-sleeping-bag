@@ -66,9 +66,17 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
 
     return (
         <React.Fragment>
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Box sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "90vh",
+                bgcolor: "grey.200"
+            }}>
                 <ChatThread chatHistory={chatHistory} loading={loading} />
-                <Box sx={{ p: 2 }} >
+                <Box sx={{
+                    p: 2,
+                    backgroundColor: "background.default"
+                }} >
                     <Request request={request} success={success} loading={loading} setRequest={setRequest} handleSubmit={handleSubmit} handleClickOpen={handleClickOpen} />
                 </Box>
             </Box>
@@ -106,6 +114,7 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
             setResponseMessage(undefined);
 
             let chatHistoryItem: ChatHistoryItem = {
+                id: chatHistory.length,
                 content: request,
                 role: "user"
             };
@@ -116,6 +125,7 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
             let response = await callApi();
 
             let chatHistoryItemResponse: ChatHistoryItem = {
+                id: chatHistory.length + 1,
                 content: response.finalAnswer ?? response,
                 role: "assistant"
             };
