@@ -109,40 +109,42 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
                 content: request,
                 role: "user"
             };
+
             setChatHistory(chatHistory => ([...chatHistory, chatHistoryItem]));
             setRequest("");
 
             let response = await callApi();
 
             let chatHistoryItemResponse: ChatHistoryItem = {
-                content: response.finalAnswer,
+                content: response.finalAnswer ?? response,
                 role: "assistant"
             };
 
             setChatHistory(chatHistory => ([...chatHistory, chatHistoryItemResponse]));
-            setEntireChatHistory(entireChatHistory => ([...entireChatHistory, ...response.chatHistory]));
+            setEntireChatHistory(entireChatHistory => ([...entireChatHistory, ...response.chatHistory ?? []]));
             setResponseMessage(response);
             setSuccess(true);
             setLoading(false);
         }
-
-
     }
 
     async function callApi() {
-        const response = await fetch(`${config.api.baseUrl}/recommendation`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message: request, chatHistory: entireChatHistory }),
-        }).then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return response.json();
-        });
-        return response;
+        try {
+            const response = await fetch(`${config.api.baseUrl}/recommendation`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: request, chatHistory: entireChatHistory }),
+            }).then((response) => {
+                return response.json();
+            }).
+                catch(error => {
+                    return error.message;
+                });
+            return response;
+        } catch (error) {
+            return error;
+        }
     }
 }
