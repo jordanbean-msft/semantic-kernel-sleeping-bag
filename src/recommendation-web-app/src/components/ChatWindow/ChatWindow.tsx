@@ -54,7 +54,7 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
             setLoading(false);
             setReset(false);
         }
-    });
+    }, [reset, setReset]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -69,7 +69,7 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
             <Box sx={{
                 display: "flex",
                 flexDirection: "column",
-                height: "90vh",
+                height: "92vh",
                 bgcolor: "grey.200"
             }}>
                 <ChatThread chatHistory={chatHistory} loading={loading} />
@@ -148,10 +148,9 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
                 body: JSON.stringify({ message: request, chatHistory: entireChatHistory }),
             }).then((response) => {
                 return response.json();
-            }).
-                catch(error => {
-                    return error.message;
-                });
+            }).catch(error => {
+                return error.message;
+            });
             return response;
         } catch (error) {
             return error;
