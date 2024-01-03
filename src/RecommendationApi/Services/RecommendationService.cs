@@ -12,31 +12,21 @@ using System.Text.Json;
 
 #pragma warning disable SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Services
 {
     public class RecommendationService
     {
         private readonly Kernel _kernel;
-        private readonly List<ChatHistoryItem> _chatHistoryFromEventHandler = new();
+        private readonly List<ChatHistoryItem> _chatHistoryFromEventHandler = [];
         //private readonly ILogger _logger;
-        //private readonly ISemanticTextMemory _memory;
+        private readonly ISemanticTextMemory _memory;
 
         public RecommendationService(Kernel kernel)//, ILogger logger)
         {
             _kernel = kernel;
             //_logger = logger;
-            //_memory = kernel.GetRequiredService<ISemanticTextMemory>();
-
-            //var historicalWeatherLookupPlugin = _kernel.CreatePluginFromType<HistoricalWeatherLookupPlugin>();
-
-            //foreach(var function in historicalWeatherLookupPlugin)
-            //{
-            //    var fullyQualifiedName = historicalWeatherLookupPlugin.Name + "-" + function.Name;
-            //    _memory.SaveInformationAsync("functions", 
-            //        fullyQualifiedName + ": " + function.Description, 
-            //        fullyQualifiedName,
-            //        additionalMetadata: function.Name).Wait();
-            //}
+            _memory = kernel.GetRequiredService<ISemanticTextMemory>();
 
             _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
             _kernel.ImportPluginFromType<LocationLookupPlugin>();
@@ -50,12 +40,8 @@ namespace RecommendationApi.Services
             var currentDate = DateTime.Now.ToString("MMM-dd-yyyy");
             _chatHistoryFromEventHandler.Clear();
 
-            _kernel.PromptRendering += Kernel_PromptRendering;
-            _kernel.PromptRendered += Kernel_PromptRendered;
-            _kernel.FunctionInvoking += Kernel_FunctionInvoking;
             _kernel.FunctionInvoked += Kernel_FunctionInvoked;
 
-            #region FunctionCallingStepwisePlanner
             var config = new FunctionCallingStepwisePlannerConfig
             {
                 ExecutionSettings = new OpenAIPromptExecutionSettings
@@ -68,7 +54,7 @@ namespace RecommendationApi.Services
 
             var planner = new FunctionCallingStepwisePlanner(config);
 
-            FunctionCallingStepwisePlannerResult response = null;
+            FunctionCallingStepwisePlannerResult? response = null;
             Response returnValue = new();
 
             try
@@ -88,68 +74,10 @@ namespace RecommendationApi.Services
             {
                 return ParseResponse(response!);
             }
-
-            #endregion
-
-            #region HandlebarsPlanner
-            //var config = new HandlebarsPlannerConfig
-            //{
-            //    AllowLoops = true,
-            //    MaxTokens = 4000
-            //};
-
-            //var planner = new HandlebarsPlanner(config);
-            //HandlebarsPlan plan = null;
-            //try
-            //{
-            //    plan = await planner.CreatePlanAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user \"{request.Message}\". Make sure and look up any needed context for the specific user that is making the request \"{username}\". The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
-            //}
-            //catch (Exception ex)
-            //{
-            //    return new Response
-            //    {
-            //        FunctionCount = ex.Message
-            //    };
-            //}
-
-            //var response = plan.Invoke(_kernel, [], CancellationToken.None);
-            //return new Response
-            //{
-            //    //FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
-            //    //Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
-            //    //StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
-            //    //OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
-            //    FunctionCount = response ?? ""
-            //};
-            #endregion
-
-            #region StepwisePlanner
-            //var stepwisePlannerConfig = new StepwisePlannerConfig
-            //{
-            //    MaxIterations = 10,
-            //    MaxTokens = 4000
-            //};
-
-            //var planner = new StepwisePlanner(_kernel, stepwisePlannerConfig);
-
-            //var plan = planner.CreatePlan($"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.");
-
-            //FunctionResult? response = await plan.InvokeAsync(request.Message);
-
-            //return new Response
-            //{
-            //    FunctionCount = response.Metadata["functionCount"].ToString() ?? "",
-            //    Iterations = int.Parse(response.Metadata["iterations"].ToString() ?? ""),
-            //    StepCount = int.Parse(response.Metadata["stepCount"].ToString() ?? ""),
-            //    OpenAIMessages = JsonSerializer.Deserialize<List<OpenAIMessage>>(response.Metadata["stepsTaken"].ToString() ?? "") ?? []
-            //}; 
-            #endregion
-
         }
 
         private void Kernel_FunctionInvoked(object? sender, FunctionInvokedEventArgs e)
         {
-            Console.WriteLine(e);
             _chatHistoryFromEventHandler.Add(new ChatHistoryItem
             {
                 Content = e.Result.ToString(),
@@ -161,22 +89,7 @@ namespace RecommendationApi.Services
             });
         }
 
-        private void Kernel_FunctionInvoking(object? sender, FunctionInvokingEventArgs e)
-        {
-            Console.WriteLine(e);
-        }
-
-        private void Kernel_PromptRendered(object? sender, PromptRenderedEventArgs e)
-        {
-            Console.WriteLine(e);
-        }
-
-        private void Kernel_PromptRendering(object? sender, PromptRenderingEventArgs e)
-        {
-            Console.WriteLine(e);
-        }
-
-        private Response ParseResponse(FunctionCallingStepwisePlannerResult functionCallingStepwisePlannerResult)
+        private static Response ParseResponse(FunctionCallingStepwisePlannerResult functionCallingStepwisePlannerResult)
         {
             var response = new Response
             {
@@ -191,15 +104,6 @@ namespace RecommendationApi.Services
         private static List<ChatHistoryItem> ParseChatHistory(ChatHistory chatHistory)
         {
             var chatHistoryItems = new List<ChatHistoryItem>();
-
-            //foreach (var item in _chatHistoryFromEventHandler)
-            //{
-            //    if (item.CompletionTokens > 0) {
-            //        var newItem = item;
-            //        newItem.Role = "assistant";
-            //        chatHistoryItems.Add(item);
-            //    }
-            //}
 
             foreach (var item in chatHistory)
             {
@@ -224,3 +128,4 @@ namespace RecommendationApi.Services
 }
 #pragma warning restore SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

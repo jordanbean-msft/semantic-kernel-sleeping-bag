@@ -13,9 +13,7 @@ namespace RecommendationApi.Plugins
             ILogger logger,
             CancellationToken cancellationToken)
         {
-#pragma warning disable CA2254 // Template should be a static expression
             logger.LogDebug($"LocationLookupPlugin.LocationLookupAsync: {location}");
-#pragma warning restore CA2254 // Template should be a static expression
 
             var httpRequest = daprClient.CreateInvokeMethodRequest(HttpMethod.Get, "location-lookup", $"location?nameOflocation={location}");
             HttpResponseMessage result = await daprClient.InvokeMethodWithResponseAsync(httpRequest, cancellationToken);
