@@ -3,7 +3,7 @@ import mermaid from "mermaid";
 import { ResponseMessage } from "../../@types/ResponseMessage";
 
 mermaid.initialize({
-  startOnLoad: true,
+    startOnLoad: true,
 });
 
 interface ResponseGraphProps {
@@ -19,10 +19,10 @@ export default function ResponseGraph({ response }: ResponseGraphProps) {
     }, []);
 
     return (
-    <div className="mermaid">
-        { data }         
-    </div>
-  );
+        <div className="mermaid">
+            {data}
+        </div>
+    );
 }
 
 function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
@@ -33,7 +33,7 @@ function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
     let semanticFunctions = "";
 
     response?.chatHistory.forEach((message) => {
-        if((message.role === "assistant" && message.functionName !== "" && !message.functionName.includes("_")) || message.functionName === "UserInteraction_SendFinalAnswer") {
+        if ((message.role === "assistant" && message.functionName !== "" && !message.functionName.includes("_")) || message.functionName === "UserInteraction_SendFinalAnswer") {
             semanticFunctionNames.add(message.functionName);
         }
 
@@ -87,9 +87,9 @@ function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
         }
     }
     );
-   
+
     let mermaidDiagram =
-    `sequenceDiagram
+        `sequenceDiagram
          box OpenAI Semantic Functions
          ${semanticFunctions}
          participant OpenAI

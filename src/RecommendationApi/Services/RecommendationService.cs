@@ -3,16 +3,17 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Planning;
-
-//using Microsoft.SemanticKernel.Planning.Handlebars;
+using Microsoft.SemanticKernel.Plugins.Core;
+using Microsoft.SemanticKernel.Plugins.Memory;
 using RecommendationApi.Models;
 using RecommendationApi.Plugins;
-using System.Text;
 using System.Text.Json;
 
 #pragma warning disable SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0050 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace RecommendationApi.Services
 {
     public class RecommendationService
@@ -32,6 +33,8 @@ namespace RecommendationApi.Services
             _kernel.ImportPluginFromType<LocationLookupPlugin>();
             _kernel.ImportPluginFromType<OrderHistoryPlugin>();
             _kernel.ImportPluginFromType<ProductCatalogPlugin>();
+            //_kernel.ImportPluginFromType<TimePlugin>();
+            //_kernel.ImportPluginFromType<TextMemoryPlugin>();
         }
 
         public async Task<Response> ResponseAsync(Request request)
@@ -57,7 +60,7 @@ namespace RecommendationApi.Services
                 ExecutionSettings = new OpenAIPromptExecutionSettings
                 {
                     ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
-                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                    
                 }
             };
 
@@ -68,10 +71,19 @@ namespace RecommendationApi.Services
 
             try
             {
-                response = await planner.ExecuteAsync(_kernel, 
-                    $@"Username: {username}
-                       Current Date: {currentDate}
-                       User request: {request.Message}");
+                //response = await planner.ExecuteAsync(_kernel, 
+                //    $@"Username: {username}
+                //       Current Date: {{time.Date}}
+                //       Previous Chat History: {{recall {request.Message}, asdf}}
+                //       User request: {request.Message}");
+
+                //response = await planner.ExecuteAsync(_kernel,
+                //    $@"Username: {username}
+                //       Current Date: {currentDate}
+                //       Previous Chat History: {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}
+                //       User request: {request.Message}");
+
+                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}\". The user question is \"{request.Message}\"");
             }
             catch (Exception ex)
             {
@@ -142,3 +154,5 @@ namespace RecommendationApi.Services
 #pragma warning restore SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0061 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning restore SKEXP0003 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning restore SKEXP0050 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning restore SKEXP0052 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
