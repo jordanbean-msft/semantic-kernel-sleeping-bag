@@ -38,18 +38,27 @@ namespace RecommendationApi.Services
         {
             var username = "dkschrute";
             var currentDate = DateTime.Now.ToString("MMM-dd-yyyy");
+
+            //await _memory.SaveReferenceAsync("asdf", username, Guid.NewGuid().ToString(), "local");
+            //await _memory.SaveReferenceAsync("asdf", currentDate, Guid.NewGuid().ToString(), "local");
+
+            foreach (var chatHistoryItem in request.ChatHistory)
+            {
+                await _memory.SaveReferenceAsync("asdf", chatHistoryItem.Content, Guid.NewGuid().ToString(), "local");
+            }
+
             _chatHistoryFromEventHandler.Clear();
 
             _kernel.FunctionInvoked += Kernel_FunctionInvoked;
 
+            #region FunctionCallingStepwisePlanner
             var config = new FunctionCallingStepwisePlannerConfig
             {
                 ExecutionSettings = new OpenAIPromptExecutionSettings
                 {
-                    ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
-                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                    
+                    ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
+                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
                 }
-                
             };
 
             var planner = new FunctionCallingStepwisePlanner(config);
@@ -59,11 +68,14 @@ namespace RecommendationApi.Services
 
             try
             {
-                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}\". The user question is \"{request.Message}\"");
+                response = await planner.ExecuteAsync(_kernel, 
+                    $@"Username: {username}
+                       Current Date: {currentDate}
+                       User request: {request.Message}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                 returnValue.FinalAnswer = ex.Message;
+                returnValue.FinalAnswer = ex.Message;
             }
 
             if (returnValue.FinalAnswer != "")
@@ -74,6 +86,7 @@ namespace RecommendationApi.Services
             {
                 return ParseResponse(response!);
             }
+            #endregion
         }
 
         private void Kernel_FunctionInvoked(object? sender, FunctionInvokedEventArgs e)
@@ -123,7 +136,7 @@ namespace RecommendationApi.Services
                 }
             }
             return chatHistoryItems;
-        }        
+        }
     }
 }
 #pragma warning restore SKEXP0004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

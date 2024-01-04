@@ -77,10 +77,13 @@ namespace RecommendationApi.Extensions
 
             kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, sp.GetRequiredService<OpenAIClient>());
 
-            var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-            {
-                TenantId = config["EntraID:TenantId"]
-            });
+            //var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            //{
+            //    TenantId = config["EntraID:TenantId"]
+            //});
+            var apiKey = config["OpenAI:ApiKey"];
+
+            ArgumentNullException.ThrowIfNull(apiKey, "OpenAI:ApiKey is required");
 
             var endpoint = config["OpenAI:Endpoint"];
             ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
@@ -88,7 +91,7 @@ namespace RecommendationApi.Extensions
             kernelBuilder.Services.AddScoped(semanticTextMemory =>
             {
                 var memory = new MemoryBuilder()
-                    .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, endpoint, defaultAzureCredential, embeddingModelId)
+                    .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, endpoint, apiKey, embeddingModelId)
                     .WithMemoryStore(new VolatileMemoryStore())
                     .Build();
 
