@@ -31,7 +31,6 @@ var recommendationApi = builder.AddProject<Projects.RecommendationApi>("recommen
     .WithDaprSidecar();
 
 var recommendationWebApp = builder.AddNpmApp("recommendation-web-app", "../recommendation-web-app", "start")
-    .WithReference(recommendationApi)
-    .WithServiceBinding(hostPort: 3000, scheme: "http", env: "PORT");
+    .WithReference(recommendationApi);
 
 builder.Build().Run();
