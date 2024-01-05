@@ -1,5 +1,4 @@
 using HitTVShows;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -36,14 +34,5 @@ app.MapGet("/hitTVShowsByYear", (int year) =>
 })
 .WithName("GetHitTVShows")
 .WithOpenApi();
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
-    RequestPath = "/.well-known"
-});
-
-
-app.MapHealthChecks("/healthz");
 
 app.Run();

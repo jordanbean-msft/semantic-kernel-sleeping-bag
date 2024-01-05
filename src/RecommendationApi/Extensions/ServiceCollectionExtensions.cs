@@ -18,25 +18,48 @@ namespace RecommendationApi.Extensions
             {
                 var config = sp.GetRequiredService<IConfiguration>();
 
-                var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-                {
-                    TenantId = config["EntraID:TenantId"]
-                });
-
                 var endpoint = config["OpenAI:Endpoint"];
-
                 ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-                var apiKey = config["OpenAI:ApiKey"];
+                OpenAIClient? client = null;
 
-                ArgumentNullException.ThrowIfNull(apiKey, "OpenAI:ApiKey is required");
-                
-                var client = new OpenAIClient(new Uri(endpoint), new Azure.AzureKeyCredential(apiKey));
+                if (bool.Parse(config["OpenAI:UseApiKey"]!))
+                {
+                    var apiKey = config["OpenAI:ApiKey"];
+                    ArgumentNullException.ThrowIfNull(apiKey, "OpenAI:ApiKey is required");
+
+                    client = new OpenAIClient(new Uri(endpoint), new Azure.AzureKeyCredential(apiKey));
+                }
+                else
+                {
+                    var tenantId = config["EntraID:TenantId"];
+                    ArgumentNullException.ThrowIfNull(tenantId, "EntraID:TenantId is required");
+
+                    var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                    {
+                        TenantId = tenantId
+                    });
+
+                    client = new OpenAIClient(new Uri(endpoint), defaultAzureCredential);
+                }
 
                 return client;
             });
 
-            services.AddScoped<RecommendationService>();          
+            services.AddScoped<RecommendationService>();
+
+            services.AddSingleton(memory =>
+            {
+                var config = memory.GetRequiredService<IConfiguration>();
+
+                var embeddingDeploymentName = config["OpenAI:EmbeddingDeploymentName"];
+                ArgumentNullException.ThrowIfNull(embeddingDeploymentName, "OpenAI:EmbeddingDeploymentName is required");
+
+                var embeddingModelId = config["OpenAI:EmbeddingModelId"];
+                ArgumentNullException.ThrowIfNull(embeddingModelId, "OpenAI:EmbeddingModelId is required");
+
+                return AddMemory(config, embeddingDeploymentName, embeddingModelId);
+            });
 
             services.AddScoped(sp =>
             {
@@ -44,22 +67,27 @@ namespace RecommendationApi.Extensions
 
                 var config = sp.GetRequiredService<IConfiguration>();
 
-                kernelBuilder.Services.AddLogging(configure =>
-                {
-                    configure.AddApplicationInsights(configureTelemetryConfiguration: (telemetryConfiguration) =>
-                    {
-                        var connectionString = config["ApplicationInsights:ConnectionString"];
-                        ArgumentNullException.ThrowIfNull(connectionString, "ApplicationInsights:ConnectionString is required");
+                string? connectionString = config["ApplicationInsights:ConnectionString"];
 
-                        telemetryConfiguration.ConnectionString = connectionString;
-                    }, configureApplicationInsightsLoggerOptions: (options) => { });
-                });
+                if (connectionString != null)
+                {
+                    kernelBuilder.Services.AddLogging(configure =>
+                    {
+                        configure.AddApplicationInsights(configureTelemetryConfiguration: (telemetryConfiguration) =>
+                        {
+
+                            telemetryConfiguration.ConnectionString = connectionString;
+                        }, configureApplicationInsightsLoggerOptions: (options) => { });
+                    });
+                }
 
                 AddChatCompletion(sp, kernelBuilder, config);
-                
-                AddTextEmbedding(sp, kernelBuilder, config);
+
+                AddTextEmbedding(sp, kernelBuilder, config);                
 
                 kernelBuilder.Services.AddDaprClient();
+
+                kernelBuilder.Services.AddSingleton(sp.GetRequiredService<ISemanticTextMemory>());
 
                 return kernelBuilder.Build();
             });
@@ -76,27 +104,42 @@ namespace RecommendationApi.Extensions
             ArgumentNullException.ThrowIfNull(embeddingModelId, "OpenAI:EmbeddingModelId is required");
 
             kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, sp.GetRequiredService<OpenAIClient>());
+        }
 
-            //var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-            //{
-            //    TenantId = config["EntraID:TenantId"]
-            //});
-            var apiKey = config["OpenAI:ApiKey"];
-
-            ArgumentNullException.ThrowIfNull(apiKey, "OpenAI:ApiKey is required");
-
+        private static ISemanticTextMemory AddMemory(IConfiguration config, string embeddingDeploymentName, string embeddingModelId)
+        {
             var endpoint = config["OpenAI:Endpoint"];
             ArgumentNullException.ThrowIfNull(endpoint, "OpenAI:Endpoint is required");
 
-            kernelBuilder.Services.AddScoped(semanticTextMemory =>
+            ISemanticTextMemory? semanticTextMemory;
+
+            if (bool.Parse(config["OpenAI:UseApiKey"]!))
             {
-                var memory = new MemoryBuilder()
+                var apiKey = config["OpenAI:ApiKey"];
+                ArgumentNullException.ThrowIfNull(apiKey, "OpenAI:ApiKey is required");
+
+                semanticTextMemory = new MemoryBuilder()
                     .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, endpoint, apiKey, embeddingModelId)
                     .WithMemoryStore(new VolatileMemoryStore())
                     .Build();
+            }
+            else
+            {
+                var tenantId = config["EntraID:TenantId"];
+                ArgumentNullException.ThrowIfNull(tenantId, "EntraID:TenantId is required");
 
-                return memory;
-            });
+                var defaultAzureCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    TenantId = tenantId
+                });
+
+                semanticTextMemory = new MemoryBuilder()
+                    .WithAzureOpenAITextEmbeddingGeneration(embeddingDeploymentName, endpoint, defaultAzureCredential, embeddingModelId)
+                    .WithMemoryStore(new VolatileMemoryStore())
+                    .Build();
+            }
+
+            return semanticTextMemory;
         }
 
         private static void AddChatCompletion(IServiceProvider sp, IKernelBuilder kernelBuilder, IConfiguration config)

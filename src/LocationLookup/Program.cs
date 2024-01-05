@@ -6,11 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -40,19 +37,7 @@ app.MapGet("/location", Results<Ok<LatLong>, NotFound<NotFoundMessage>> (string 
     return location != null ? TypedResults.Ok(location) : TypedResults.NotFound(new NotFoundMessage { Message = $"No location found for {nameOfLocation}." });
 })
 .WithName("GetLocation")
-.WithOpenApi(generatedOperation =>
-{
-    generatedOperation.Summary = "Gets the latitude & longitude GPS coordinates of a specific location name. Use this function to get specific GPS coordinates for all user queries. Do not guess at GPS coordinates, call this service to get them.";
-    generatedOperation.Parameters[0].Description = "The string location to lookup GPS coordinates for. This should be a string, not JSON.";
-    return generatedOperation;
-});
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
-    RequestPath = "/.well-known"
-});
-
+.WithOpenApi();
 
 app.Run();
 

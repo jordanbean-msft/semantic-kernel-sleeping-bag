@@ -16,13 +16,20 @@ export default function ResponseGraph({ response }: ResponseGraphProps) {
     React.useEffect(() => {
         mermaid.initialize({ sequence: { showSequenceNumbers: true } });
         mermaid.contentLoaded();
+        mermaid.parseError = function (err, hash) {
+            console.log("Error parsing:", err);
+            console.log(data)
+        }
     }, []);
+
+    mermaid.parse(data).then((response) => {        
+    });
 
     return (
         <div className="mermaid">
             {data}
         </div>
-    );
+    )
 }
 
 function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
@@ -80,8 +87,8 @@ function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
         }
 
         if (message.role === "tool") {
-            chatMessages += `    ${chatHistory[index - 1].functionName}->>WebApp: ${addNewLineAt80Characters(`${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
-            chatMessages += `    Note over ${chatHistory[index - 1].functionName},WebApp: ${message.role}\n`;
+            chatMessages += `    ${message.functionName}->>WebApp: ${addNewLineAt80Characters(`${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
+            chatMessages += `    Note over ${message.functionName},WebApp: ${message.role}\n`;
             chatMessages += `    WebApp->>OpenAI: ${addNewLineAt80Characters(`${chatHistory[index - 1].functionName} ${message.content?.replace(/(?:\r\n|\r|\n)/g, '<br/>')}`)}\n`;
             chatMessages += `    Note over WebApp,OpenAI: ${message.role}\n`;
         }

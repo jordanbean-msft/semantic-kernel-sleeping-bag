@@ -7,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -35,14 +34,6 @@ app.MapGet("/hitMoviesByTag", (List<string> tags) =>
 })
 .WithName("GetHitMoviesByTag")
 .WithOpenApi();
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(builder.Environment.ContentRootPath),
-    RequestPath = "/.well-known"
-});
-
-app.MapHealthChecks("/healthz");
 
 app.Run();
 

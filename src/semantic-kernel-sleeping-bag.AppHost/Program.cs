@@ -1,8 +1,6 @@
-using Aspire.Dashboard.Components.Pages;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
-var appInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+string? appInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
 
 builder.AddDapr();
 

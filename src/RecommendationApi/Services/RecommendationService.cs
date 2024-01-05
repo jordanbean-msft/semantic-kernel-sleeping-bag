@@ -1,4 +1,5 @@
-﻿using Microsoft.SemanticKernel;
+﻿using Azure.AI.OpenAI;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Memory;
@@ -23,18 +24,19 @@ namespace RecommendationApi.Services
         //private readonly ILogger _logger;
         private readonly ISemanticTextMemory _memory;
 
-        public RecommendationService(Kernel kernel)//, ILogger logger)
+        public RecommendationService(Kernel kernel, ISemanticTextMemory memory)//, ILogger logger)
         {
             _kernel = kernel;
             //_logger = logger;
-            _memory = kernel.GetRequiredService<ISemanticTextMemory>();
+            //_memory = kernel.GetRequiredService<ISemanticTextMemory>();
+            _memory = memory;
 
             _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
             _kernel.ImportPluginFromType<LocationLookupPlugin>();
             _kernel.ImportPluginFromType<OrderHistoryPlugin>();
             _kernel.ImportPluginFromType<ProductCatalogPlugin>();
-            //_kernel.ImportPluginFromType<TimePlugin>();
-            //_kernel.ImportPluginFromType<TextMemoryPlugin>();
+            _kernel.ImportPluginFromType<TextMemoryPlugin>();
+            _kernel.ImportPluginFromType<ConversationSummaryPlugin>();
         }
 
         public async Task<Response> ResponseAsync(Request request)
@@ -42,26 +44,53 @@ namespace RecommendationApi.Services
             var username = "dkschrute";
             var currentDate = DateTime.Now.ToString("MMM-dd-yyyy");
 
-            //await _memory.SaveReferenceAsync("asdf", username, Guid.NewGuid().ToString(), "local");
-            //await _memory.SaveReferenceAsync("asdf", currentDate, Guid.NewGuid().ToString(), "local");
+            ChatHistory? chatHistory = null;
 
-            foreach (var chatHistoryItem in request.ChatHistory)
+            MemoryQueryResult? result = await _memory.GetAsync(username, request.ChatId);
+            if (result == null)
             {
-                await _memory.SaveReferenceAsync("asdf", chatHistoryItem.Content, Guid.NewGuid().ToString(), "local");
+                chatHistory = new ChatHistory($@"System: You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.
+                   Username: {username}
+                   Current Date: {currentDate}");
             }
+            else
+            {
+                chatHistory = JsonSerializer.Deserialize<ChatHistory>(result.Metadata.Text);
+            }
+
+            chatHistory!.AddUserMessage(request.Message);
 
             _chatHistoryFromEventHandler.Clear();
 
             _kernel.FunctionInvoked += Kernel_FunctionInvoked;
 
+            #region ChatMessage
+
+            OpenAIPromptExecutionSettings promptExecutionSettings = new()
+            {
+                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+            };
+
+            var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
+
+            var chatMessageContentsResult = await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel);
+
+            chatHistory.AddAssistantMessage(chatMessageContentsResult[chatMessageContentsResult.Count - 1].Content!);
+
+            await _memory.SaveInformationAsync(username, JsonSerializer.Serialize(chatHistory), request.ChatId);
+
+            return new Response
+            {
+                ChatHistory = ParseChatHistory(chatHistory),
+                FinalAnswer = chatMessageContentsResult[chatMessageContentsResult.Count - 1].Content!
+            };
+
+            #endregion
+
             #region FunctionCallingStepwisePlanner
             var config = new FunctionCallingStepwisePlannerConfig
             {
-                ExecutionSettings = new OpenAIPromptExecutionSettings
-                {
-                    ChatSystemPrompt = $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.",
-                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                    
-                }
+
             };
 
             var planner = new FunctionCallingStepwisePlanner(config);
@@ -69,35 +98,37 @@ namespace RecommendationApi.Services
             FunctionCallingStepwisePlannerResult? response = null;
             Response returnValue = new();
 
-            try
-            {
-                //response = await planner.ExecuteAsync(_kernel, 
-                //    $@"Username: {username}
-                //       Current Date: {{time.Date}}
-                //       Previous Chat History: {{recall {request.Message}, asdf}}
-                //       User request: {request.Message}");
+            //try
+            //{
+            //    //response = await planner.ExecuteAsync(_kernel, 
+            //    //    $@"Username: {username}
+            //    //       Current Date: {{time.Date}}
+            //    //       Previous Chat History: {{recall {request.Message}, asdf}}
+            //    //       User request: {request.Message}");
 
-                //response = await planner.ExecuteAsync(_kernel,
-                //    $@"Username: {username}
-                //       Current Date: {currentDate}
-                //       Previous Chat History: {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}
-                //       User request: {request.Message}");
+            //    //response = await planner.ExecuteAsync(_kernel,
+            //    //    $@"Username: {username}
+            //    //       Current Date: {currentDate}
+            //    //       Previous Chat History: {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}
+            //    //       User request: {request.Message}");
 
-                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}\". The user question is \"{request.Message}\"");
-            }
-            catch (Exception ex)
-            {
-                returnValue.FinalAnswer = ex.Message;
-            }
+            //    response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. A summary of the current conversation is {{ConversationSummaryPlugin.SummarizeConversation {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))} }} The user question is \"{request.Message}\"");
 
-            if (returnValue.FinalAnswer != "")
-            {
-                return returnValue;
-            }
-            else
-            {
-                return ParseResponse(response!);
-            }
+            //    //response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}\". The user question is \"{request.Message}\"");
+            //}
+            //catch (Exception ex)
+            //{
+            //    returnValue.FinalAnswer = ex.Message;
+            //}
+
+            //if (returnValue.FinalAnswer != "")
+            //{
+            //    return returnValue;
+            //}
+            //else
+            //{
+            //    return ParseResponse(response!);
+            //}
             #endregion
         }
 
@@ -107,7 +138,7 @@ namespace RecommendationApi.Services
             {
                 Content = e.Result.ToString(),
                 PromptTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
-                CompletionTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.CompletionTokens ?? 0,
+                CompletionTokens = (e.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.CompletionTokens ?? 0,
                 TotalTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
                 FunctionName = e.Function.Name,
                 FunctionArguments = string.Join(", ", e.Arguments)
@@ -132,20 +163,62 @@ namespace RecommendationApi.Services
 
             foreach (var item in chatHistory)
             {
-                if (item.Role != AuthorRole.User)
+                var functionName = "";
+
+                if (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") != null)
                 {
-                    var chatHistoryItem = new ChatHistoryItem
-                    {
-                        Content = item.Content ?? "",
-                        Role = item.Role.Label,
-                        PromptTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
-                        CompletionTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.CompletionTokens ?? 0,
-                        TotalTokens = (item.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
-                        FunctionName = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Name ?? "",
-                        FunctionArguments = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<Azure.AI.OpenAI.ChatCompletionsFunctionToolCall>)?[0].Arguments ?? ""
-                    };
-                    chatHistoryItems.Add(chatHistoryItem);
+                    functionName = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<ChatCompletionsFunctionToolCall>)?[0].Name ?? "";
                 }
+                else
+                {
+                    var functionId = item.Metadata?.GetValueOrDefault("ChatCompletionsToolCall.Id") ?? "";
+
+                    if (functionId != "")
+                    {
+                        foreach (var chatMessageContent in chatHistory)
+                        {
+                            List<ChatCompletionsFunctionToolCall>? functionToolCalls = chatMessageContent.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<ChatCompletionsFunctionToolCall>;
+
+                            if (functionToolCalls != null)
+                            {
+                                if (functionToolCalls[0].Id == (functionId as string))
+                                {
+                                    functionName = functionToolCalls[0].Name;
+                                    break;
+                                }
+                            }
+                            else //this is needed because "sometimes" the functionToolCall is not a List<ChatCompletionsFunctionToolCall> but a JsonElement (especially when it is the return value of a Tool role call)
+                            {
+                                try
+                                {
+                                    JsonElement functionToolCallsJson = (JsonElement)chatMessageContent.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls");
+
+                                    if (functionToolCallsJson[0].GetProperty("Id").ToString() == functionId.ToString())
+                                    {
+                                        functionName = functionToolCallsJson[0].GetProperty("Name").ToString();
+                                        break;
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    //do nothing
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var chatHistoryItem = new ChatHistoryItem
+                {
+                    Content = item.Content ?? "",
+                    Role = item.Role.Label,
+                    PromptTokens = (item.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.PromptTokens ?? 0,
+                    CompletionTokens = (item.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.CompletionTokens ?? 0,
+                    TotalTokens = (item.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.TotalTokens ?? 0,
+                    FunctionName = functionName ?? "",
+                    FunctionArguments = (item.Metadata?.GetValueOrDefault("ChatResponseMessage.FunctionToolCalls") as List<ChatCompletionsFunctionToolCall>)?[0].Arguments ?? ""
+                };
+                chatHistoryItems.Add(chatHistoryItem);
             }
             return chatHistoryItems;
         }

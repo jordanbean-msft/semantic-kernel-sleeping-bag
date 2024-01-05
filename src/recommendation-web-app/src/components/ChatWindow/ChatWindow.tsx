@@ -17,6 +17,8 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import Box from '@mui/material/Box';
+import { RequestMessage } from '../../@types/RequestMessage';
+import { v4 as uuidv4 } from 'uuid';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -38,6 +40,7 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
     const [responseMessage, setResponseMessage] = useState<ResponseMessage | undefined>(undefined);
     const [entireChatHistory, setEntireChatHistory] = useState<Array<OpenAIMessage>>([]);
     const [chatHistory, setChatHistory] = useState<Array<ChatHistoryItem>>([]);
+    const [chatId, setChatId] = useState<string>(uuidv4());
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -53,6 +56,7 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
             setSuccess(false);
             setLoading(false);
             setReset(false);
+            setChatId(uuidv4());
         }
     }, [reset, setReset]);
 
@@ -139,18 +143,25 @@ export default function ChatWindow({ reset, setReset }: ChatWindowProps) {
     }
 
     async function callApi() {
+        let requestMessage: RequestMessage = {
+            message: request,
+            chatHistory: entireChatHistory,
+            chatId: chatId
+        };
+
         try {
             const response = await fetch(`${config.api.baseUrl}/recommendation`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ message: request, chatHistory: entireChatHistory }),
+                body: JSON.stringify(requestMessage),
             }).then((response) => {
                 return response.json();
             }).catch(error => {
                 return error.message;
             });
+
             return response;
         } catch (error) {
             return error;
