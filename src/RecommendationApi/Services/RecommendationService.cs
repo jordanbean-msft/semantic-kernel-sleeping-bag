@@ -49,9 +49,7 @@ namespace RecommendationApi.Services
             MemoryQueryResult? result = await _memory.GetAsync(username, request.ChatId);
             if (result == null)
             {
-                chatHistory = new ChatHistory($@"System: You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question.
-                   Username: {username}
-                   Current Date: {currentDate}");
+                chatHistory = new ChatHistory($@"System: You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. Username: {username} Current Date: {currentDate}");
             }
             else
             {
@@ -73,30 +71,35 @@ namespace RecommendationApi.Services
 
             var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
-            var chatMessageContentsResult = await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel);
-
-            chatHistory.AddAssistantMessage(chatMessageContentsResult[chatMessageContentsResult.Count - 1].Content!);
+            foreach(var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel))
+            {
+                chatHistory.Add(chatMessage);
+            }
 
             await _memory.SaveInformationAsync(username, JsonSerializer.Serialize(chatHistory), request.ChatId);
 
             return new Response
             {
                 ChatHistory = ParseChatHistory(chatHistory),
-                FinalAnswer = chatMessageContentsResult[chatMessageContentsResult.Count - 1].Content!
+                SemanticKernelChatHistory = chatHistory,
+                FinalAnswer = chatHistory.Last().Content!
             };
 
             #endregion
 
             #region FunctionCallingStepwisePlanner
-            var config = new FunctionCallingStepwisePlannerConfig
-            {
+            //var config = new FunctionCallingStepwisePlannerConfig
+            //{
+            //    ExecutionSettings = new OpenAIPromptExecutionSettings
+            //    {
+            //        ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+            //    }
+            //};
 
-            };
+            //var planner = new FunctionCallingStepwisePlanner(config);
 
-            var planner = new FunctionCallingStepwisePlanner(config);
-
-            FunctionCallingStepwisePlannerResult? response = null;
-            Response returnValue = new();
+            //FunctionCallingStepwisePlannerResult? response = null;
+            //Response returnValue = new();
 
             //try
             //{
@@ -137,9 +140,9 @@ namespace RecommendationApi.Services
             _chatHistoryFromEventHandler.Add(new ChatHistoryItem
             {
                 Content = e.Result.ToString(),
-                PromptTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.PromptTokens ?? 0,
+                PromptTokens = (e.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.PromptTokens ?? 0,
                 CompletionTokens = (e.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.CompletionTokens ?? 0,
-                TotalTokens = (e.Metadata?.GetValueOrDefault("Usage") as Azure.AI.OpenAI.CompletionsUsage)?.TotalTokens ?? 0,
+                TotalTokens = (e.Metadata?.GetValueOrDefault("Usage") as CompletionsUsage)?.TotalTokens ?? 0,
                 FunctionName = e.Function.Name,
                 FunctionArguments = string.Join(", ", e.Arguments)
             });
@@ -149,7 +152,6 @@ namespace RecommendationApi.Services
         {
             var response = new Response
             {
-                Iterations = functionCallingStepwisePlannerResult.Iterations,
                 FinalAnswer = functionCallingStepwisePlannerResult.FinalAnswer,
                 ChatHistory = ParseChatHistory(functionCallingStepwisePlannerResult.ChatHistory!),
             };

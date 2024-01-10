@@ -44,7 +44,7 @@ function ConvertToMermaidDiagram(response: ResponseMessage | undefined) {
             semanticFunctionNames.add(message.functionName);
         }
 
-        if (message.role === "assistant" && message.functionName !== "" && message.functionName.includes("_") && message.functionName !== "UserInteraction_SendFinalAnswer") {
+        if ((message.role === "assistant" || message.role === "tool") && message.functionName !== "" && message.functionName.includes("_") && message.functionName !== "UserInteraction_SendFinalAnswer") {
             pluginFunctionNames.add(message.functionName);
         }
 
