@@ -24,11 +24,10 @@ namespace RecommendationApi.Services
         //private readonly ILogger _logger;
         private readonly ISemanticTextMemory _memory;
 
-        public RecommendationService(Kernel kernel, ISemanticTextMemory memory)//, ILogger logger)
+        public RecommendationService(Kernel kernel, ISemanticTextMemory memory)
         {
             _kernel = kernel;
             //_logger = logger;
-            //_memory = kernel.GetRequiredService<ISemanticTextMemory>();
             _memory = memory;
 
             _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
