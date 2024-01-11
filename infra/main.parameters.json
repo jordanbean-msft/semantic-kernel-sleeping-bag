@@ -32,11 +32,20 @@
     "openAiResourceGroupLocation": {
       "value": "${AZURE_OPENAI_RESOURCE_LOCATION=${AZURE_LOCATION}}"
     },
-    "chatGptDeploymentName": {
-      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT=chat}"
+    "chatCompletionDeploymentName": {
+      "value": "${AZURE_OPENAI_CHATCOMPLETION_DEPLOYMENT=chat}"
+    },
+    "chatCompletionModelId": {
+      "value": "${AZURE_OPENAI_CHATCOMPLETION_MODEL_ID}"
     },
     "embeddingDeploymentName": {
       "value": "${AZURE_OPENAI_EMBEDDING_DEPLOYMENT=embedding}"
+    },
+    "embeddingModelId": {
+      "value": "${AZURE_OPENAI_EMBEDDING_MODEL_ID}"
+    },
+    "openAiUseApiKey": {
+      "value": "${AZURE_OPENAI_USE_API_KEY=false}"
     },
     "openAiServiceName": {
       "value": "${AZURE_OPENAI_SERVICE}"

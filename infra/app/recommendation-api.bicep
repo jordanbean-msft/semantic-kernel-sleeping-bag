@@ -47,11 +47,20 @@ param keyVaultResourceGroupName string = resourceGroup().name
 @description('The OpenAI endpoint')
 param openAiEndpoint string
 
-@description('The OpenAI ChatGPT deployment name')
-param openAiChatGptDeployment string
+@description('The OpenAI Chat Completion Deployment Name')
+param openAiChatCompletionDeploymentName string
 
-@description('The OpenAI Embedding deployment name')
-param openAiEmbeddingDeployment string
+@description('The OpenAI Chat Completion Model Id')
+param openAiChatCompletionModelId string
+
+@description('The OpenAI Embedding Deployment Name')
+param openAiEmbeddingDeploymentName string
+
+@description('The OpenAI Embedding Model Id')
+param openAiEmbeddingModelId string
+
+@description('Whether or not to use an API key for authenticating to the Azure OpenAI instance')
+param openAiUseApiKey bool
 
 @description('An array of service binds')
 param serviceBinds array
@@ -91,12 +100,24 @@ module app '../core/host/container-app-upsert.bicep' = {
         value: openAiEndpoint
       }
       {
-        name: 'OpenAI__ChatModelName'
-        value: openAiChatGptDeployment
+        name: 'OpenAI__ChatCompletionDeploymentName'
+        value: openAiChatCompletionDeploymentName
       }
       {
-        name: 'OpenAI__EmbeddingModelName'
-        value: openAiEmbeddingDeployment
+        name: 'OpenAI__ChatCompletionModelId'
+        value: openAiChatCompletionModelId
+      }
+      {
+        name: 'OpenAI__EmbeddingDeploymentName'
+        value: openAiEmbeddingDeploymentName
+      }
+      {
+        name: 'OpenAI__EmbeddingModelId'
+        value: openAiEmbeddingModelId
+      }
+      {
+        name: 'OpenAI__UseApiKey'
+        value: '${openAiUseApiKey}'
       }
       {
         name: 'ApplicationInsights__ConnectionString'
