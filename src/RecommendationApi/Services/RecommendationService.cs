@@ -64,74 +64,60 @@ namespace RecommendationApi.Services
 
             #region ChatMessage
 
-            OpenAIPromptExecutionSettings promptExecutionSettings = new()
-            {
-                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-            };
+            //OpenAIPromptExecutionSettings promptExecutionSettings = new()
+            //{
+            //    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+            //};
 
-            var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
+            //var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
-            foreach(var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel))
-            {
-                chatHistory.Add(chatMessage);
-            }
+            //foreach(var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel))
+            //{
+            //    chatHistory.Add(chatMessage);
+            //}
 
-            await _memory.SaveInformationAsync(username, JsonSerializer.Serialize(chatHistory), request.ChatId);
+            //await _memory.SaveInformationAsync(username, JsonSerializer.Serialize(chatHistory), request.ChatId);
 
-            return new Response
-            {
-                ChatHistory = ParseChatHistory(chatHistory),
-                SemanticKernelChatHistory = chatHistory,
-                FinalAnswer = chatHistory.Last().Content!
-            };
+            //return new Response
+            //{
+            //    ChatHistory = ParseChatHistory(chatHistory),
+            //    SemanticKernelChatHistory = chatHistory,
+            //    FinalAnswer = chatHistory.Last().Content!
+            //};
 
             #endregion
 
             #region FunctionCallingStepwisePlanner
-            //var config = new FunctionCallingStepwisePlannerConfig
-            //{
-            //    ExecutionSettings = new OpenAIPromptExecutionSettings
-            //    {
-            //        ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-            //    }
-            //};
+            var config = new FunctionCallingStepwisePlannerConfig
+            {
+                ExecutionSettings = new OpenAIPromptExecutionSettings
+                {
+                    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+                }
+            };
 
-            //var planner = new FunctionCallingStepwisePlanner(config);
+            var planner = new FunctionCallingStepwisePlanner(config);
 
-            //FunctionCallingStepwisePlannerResult? response = null;
-            //Response returnValue = new();
+            FunctionCallingStepwisePlannerResult? response = null;
+            Response returnValue = new();
 
-            //try
-            //{
-            //    //response = await planner.ExecuteAsync(_kernel, 
-            //    //    $@"Username: {username}
-            //    //       Current Date: {{time.Date}}
-            //    //       Previous Chat History: {{recall {request.Message}, asdf}}
-            //    //       User request: {request.Message}");
+            try
+            {
+                response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. A summary of the current conversation is {{ConversationSummaryPlugin.SummarizeConversation {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))} }} The user question is \"{request.Message}\"");
+            }
+            catch (Exception ex)
+            {
+                returnValue.FinalAnswer = ex.Message;
+            }
 
-            //    //response = await planner.ExecuteAsync(_kernel,
-            //    //    $@"Username: {username}
-            //    //       Current Date: {currentDate}
-            //    //       Previous Chat History: {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}
-            //    //       User request: {request.Message}");
-
-            //    response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. A summary of the current conversation is {{ConversationSummaryPlugin.SummarizeConversation {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))} }} The user question is \"{request.Message}\"");
-
-            //    //response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The previous responses were \"{JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))}\". The user question is \"{request.Message}\"");
-            //}
-            //catch (Exception ex)
-            //{
-            //    returnValue.FinalAnswer = ex.Message;
-            //}
-
-            //if (returnValue.FinalAnswer != "")
-            //{
-            //    return returnValue;
-            //}
-            //else
-            //{
-            //    return ParseResponse(response!);
-            //}
+            if (returnValue.FinalAnswer != "")
+            {
+                return returnValue;
+            }
+            else
+            {
+                return ParseResponse(response!);
+            }
             #endregion
         }
 

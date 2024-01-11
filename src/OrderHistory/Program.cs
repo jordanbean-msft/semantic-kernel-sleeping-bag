@@ -24,19 +24,19 @@ app.UseHttpsRedirection();
 Dictionary<string, OrderHistory.OrderHistory> orderHistory = new()
 {
     {
-    "dkschrute",// "Jordan Bean",
+    "dkschrute",
     new OrderHistory.OrderHistory
     {
             OrderId = "1",
-            CustomerId = "dkschrute",//"Jordan Bean",
+            CustomerId = "dkschrute",
             OrderDate = "2021-01-01",
-            OrderTotal = "10",
+            OrderTotal = "100",
             OrderStatus = "Shipped",
             OrderItems = [
                 new() {
                     ProductId = "12345",
                     ProductName = "Eco Elite Sleeping Bag",
-                    ProductPrice = "10",
+                    ProductPrice = "100",
                     ProductQuantity = "1"
                 }
             ]

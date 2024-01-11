@@ -26,20 +26,6 @@ builder.Services.AddDaprClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAzureServices();
-//builder.Services.AddHealthChecks();
-
-string? connectionString = config["ApplicationInsights:ConnectionString"];
-
-builder.Services.AddLogging(loggingBuilder =>
-{
-    loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>(logLevel => logLevel == LogLevel.Information);
-    loggingBuilder.SetMinimumLevel(LogLevel.Information);
-});
-
-//builder.Services.AddApplicationInsightsTelemetryWorkerService(options =>
-//{
-//    options.ConnectionString = connectionString;
-//});
 
 var app = builder.Build();
 
@@ -55,7 +41,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors();
 
-//app.MapApi();
 app.MapPost("/recommendation", async Task<Results<Ok<Response>, ProblemHttpResult>> (Request request, [FromServices] RecommendationService recommendationService) =>
 {
     Response response = new Response();
