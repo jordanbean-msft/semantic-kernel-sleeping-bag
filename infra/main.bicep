@@ -68,13 +68,13 @@ param chatGptDeploymentCapacity int = 30
 param chatCompletionDeploymentName string = 'chat'
 
 @description('ID of the chat completion model')
-param chatCompletionModelId string = ''
+param chatCompletionModelId string = '0613'
 
 @description('Name of the embedding deployment. Default: embedding')
 param embeddingDeploymentName string = 'embedding'
 
 @description('ID of the embedding model')
-param embeddingModelId string = ''
+param embeddingModelId string = '2'
 
 @description('Whether or not to use an API key for the OpenAI service. Default: false')
 param openAiUseApiKey bool = false

@@ -61,6 +61,10 @@ Here is a series of blog posts that go through this demo in detail.
 > [!NOTE]  
 > Since this is using generative AI, there is no guarantee that the plan generated will exactly match the screenshots. You may have to run the demo several times to get it to output the desired result.
 
+1.  After getting a response, click on the `Thought Process` button to see a diagram detailing the steps the planner took to answer the question.
+
+![thought process](.img/thought-process.png)
+
 ## Run locally
 
 1.  Set the following application settings to initialize the `RecommendationApi` (this assumes you already have the required Azure services such as OpenAI & Application Insights deployed). Customize as needed.
