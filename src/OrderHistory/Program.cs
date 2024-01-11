@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using OrderHistory;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.AddServiceDefaults();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -29,16 +30,16 @@ Dictionary<string, OrderHistory.OrderHistory> orderHistory = new()
             OrderId = "1",
             CustomerId = "dkschrute",
             OrderDate = "2021-01-01",
-            OrderTotal = "10",
+            OrderTotal = "100",
             OrderStatus = "Shipped",
-            OrderItems = new List<OrderItems> {
+            OrderItems = [
                 new() {
                     ProductId = "12345",
                     ProductName = "Eco Elite Sleeping Bag",
-                    ProductPrice = "10",
+                    ProductPrice = "100",
                     ProductQuantity = "1"
                 }
-            }
+            ]
     }
     }
 };
@@ -54,8 +55,6 @@ app.MapGet("/orderHistory/{username}", Results<Ok<OrderHistory.OrderHistory>, No
 })
 .WithName("GetOrderHistory")
 .WithOpenApi();
-
-app.MapHealthChecks("/healthz");
 
 app.Run();
 

@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.AddServiceDefaults();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,13 +41,12 @@ app.MapGet("/historical-weather-lookup", Results<Ok<HistoricalWeather>, NotFound
 {
     historicalWeather.TryGetValue(new HistoricalWeatherInput { Latitude = latitude, Longitude = longitude, MonthOfYear = monthOfYear }, out HistoricalWeather? historicalWeatherResponse);
 
-    return historicalWeatherResponse != null ? TypedResults.Ok(historicalWeatherResponse) : TypedResults.NotFound(new NotFoundMessage { 
-        Message = $"Not Found: No historical weather found for latitude {latitude}, longitude {longitude} & monthOfYear {monthOfYear}. Make sure this is the correct GPS latitude, longitude & month of the year." 
+    return historicalWeatherResponse != null ? TypedResults.Ok(historicalWeatherResponse) : TypedResults.NotFound(new NotFoundMessage
+    {
+        Message = $"Not Found: No historical weather found for latitude {latitude}, longitude {longitude} & monthOfYear {monthOfYear}. Make sure this is the correct GPS latitude, longitude & month of the year."
     });
 })
 .WithName("GetHistoricalWeather")
 .WithOpenApi();
-
-app.MapHealthChecks("/healthz");
 
 app.Run();

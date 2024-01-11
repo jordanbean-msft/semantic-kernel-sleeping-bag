@@ -2,9 +2,9 @@
 
 ![architecture](./.img/architecture.png)
 
-This demo app demostrates how to use C# & Semantic Kernel to orchestrate AI calls. In this example, we are building a chatbot for an outdoor sports equipment company. This chatbot needs to be able to answer common questions that customer support gets.
+This demo app demonstrates how to use C# & Semantic Kernel to orchestrate AI calls. In this example, we are building a chatbot for an outdoor sports equipment company. This chatbot needs to be able to answer common questions that customer support gets.
 
-For example, a customer might ask "Will my sleeping bag work for my trip to Patagonia next month?". The chatbot needs to be able to understand the question and then answer it. The answer might be "Yes, your sleeping bag will work for your trip to Patagonia next month. The lowest average temperature in Patagonia in November is 20 degrees Fahrenheiht. Your sleeping bag is rated for 5 degrees Fahrenheit.".
+For example, a customer might ask "Will my sleeping bag work for my trip to Patagonia next month?". The chatbot needs to be able to understand the question and then answer it. The answer might be "Yes, your sleeping bag will work for your trip to Patagonia next month. The lowest average temperature in Patagonia in November is 20 degrees Fahrenheit. Your sleeping bag is rated for 5 degrees Fahrenheit.".
 
 In order to do this, the code needs to be able to call several different data sources to answer the question.
 
@@ -13,7 +13,7 @@ In order to do this, the code needs to be able to call several different data so
 1.  LocationLookup - This ia an API that returns the GPS coordindates of a given location.
 1.  HistoricalWeather - This is an API that returns the average temperature for a given GPS location and date.
 
-We need the RecommendationAPI to be able to call all of these APIs and then combine the results into a single answer. Semantic Kernel enables us to orchestrate these API calls via the StepwisePlanner. This planner will make multiple calls to the OpenAI service, make up its own plan to answer the question based upon the data & native plugins it has access to, then execute the plan.
+We need the `RecommendationAPI` to be able to call all of these APIs and then combine the results into a single answer. Semantic Kernel enables us to orchestrate these API calls via the StepwisePlanner. This planner will make multiple calls to the OpenAI service, make up its own plan to answer the question based upon the data & native plugins it has access to, then execute the plan.
 
 Here is a series of blog posts that go through this demo in detail.
 
@@ -37,7 +37,10 @@ Here is a series of blog posts that go through this demo in detail.
 ### Local development
 
 - [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Tye](https://github.com/dotnet/tye)
+- [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/)
+- [.NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview)
+  - Visual Studio (https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/setup-tooling?tabs=visual-studio)
+  - CLI (https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/setup-tooling?tabs=dotnet-cli)
 - [Dapr](https://dapr.io/)
 - [Node.js with npm](https://nodejs.org/en/)
 
@@ -58,9 +61,13 @@ Here is a series of blog posts that go through this demo in detail.
 > [!NOTE]  
 > Since this is using generative AI, there is no guarantee that the plan generated will exactly match the screenshots. You may have to run the demo several times to get it to output the desired result.
 
+1.  After getting a response, click on the `Thought Process` button to see a diagram detailing the steps the planner took to answer the question.
+
+![thought process](.img/thought-process.png)
+
 ## Run locally
 
-1.  Set the following application settings to initialize the RecommendationApi (this assumes you already have the required Azure services such as OpenAI & Application Insights deployed)..
+1.  Set the following application settings to initialize the `RecommendationApi` (this assumes you already have the required Azure services such as OpenAI & Application Insights deployed). Customize as needed.
 
     ```shell
     cd src/RecommendationApi
@@ -69,27 +76,38 @@ Here is a series of blog posts that go through this demo in detail.
 
     dotnet user-secrets set "OpenAI:Endpoint" "https://..."
 
-    dotnet user-secrets set "OpenAI:ChatModelName" "chat"
+    dotnet user-secrets set "OpenAI:ChatCompletionDeploymentName" "chat"
+    
+    dotnet user-secrets set "OpenAI:ChatCompletionModelId" "0613"
 
-    dotnet user-secrets set "OpenAI:EmbeddingModelName" "embedding"
+    dotnet user-secrets set "OpenAI:EmbeddingDeploymentName" "embedding"
+ 
+    dotnet user-secrets set "OpenAI:EmbeddingModelId" "2"
+    
+    dotnet user-secrets set "OpenAI:ApiKey": ""
 
     dotnet user-secrets set "ApplicationInsights:ConnectionString" ""
 
     dotnet user-secrets set "EntraID:TenantId" ""
 
     dotnet user-secrets set "Cors:AllowedOrigins" "http://localhost:3000"
+ 
     ```
+
+    >NOTE: The locally running demo defaults to using an API key to authenticate with the Azure OpenAI service. The version that runs in Azure uses a Managed Identity associated with the API Container App & Azure RBAC (`Cognitive Services OpenAI User` role) to authenticate with the Azure OpenAI service.`) 
 
 1.  Run the following command to start the application.
 
     ```shell
-    tye run
+    cd ..   
+ 
+    dotnet run --project .\semantic-kernel-sleeping-bag.AppHost\semantic-kernel-sleeping-bag.AppHost.csproj
     ```
 
 1.  Navigate to the following URLs to test the application.
     
     - [Web App](http://localhost:3000)
-    - [Tye dashboard (status of services)](http://localhost:8000)
+    - [Aspire dashboard (status of services)](http://localhost:15293) (NOTE: your port may be different, check the command window to be sure)
     - [Zipkin dashboard (view traces)](http://localhost:9411/zipkin)
 
 ## Links
@@ -99,5 +117,5 @@ Here is a series of blog posts that go through this demo in detail.
 - [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)
 - [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview)
 - [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview)
-- [Tye](https://github.com/dotnet/tye)
+- [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview)
 - [Dapr](https://dapr.io/)

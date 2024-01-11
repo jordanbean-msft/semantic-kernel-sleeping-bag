@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.FileProviders;
 using ProductCatalog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.AddServiceDefaults();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -42,6 +44,5 @@ app.MapGet("/productCatalog/{id}", Results<Ok<ProductCatalogItem>, NotFound<NotF
 .WithName("GetProductCatalogItem")
 .WithOpenApi();
 
-app.MapHealthChecks("/healthz");
-
 app.Run();
+

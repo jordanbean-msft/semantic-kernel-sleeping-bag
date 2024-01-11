@@ -1,4 +1,5 @@
 using HitMovies;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -19,14 +19,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-List<HitMovie> hits = new()
-{
+List<HitMovie> hits =
+[
     new(){
         Title = "GalaxyQuest",
-        Actors = new(){ "Rainn Wilson" },
-        Tags = new(){ "comedy", "sci-fi" }
+        Actors = ["Rainn Wilson"],
+        Tags = ["comedy", "sci-fi"]
     }
-};
+];
 
 app.MapGet("/hitMoviesByTag", (List<string> tags) =>
 {
@@ -34,8 +34,6 @@ app.MapGet("/hitMoviesByTag", (List<string> tags) =>
 })
 .WithName("GetHitMoviesByTag")
 .WithOpenApi();
-
-app.MapHealthChecks("/healthz");
 
 app.Run();
 

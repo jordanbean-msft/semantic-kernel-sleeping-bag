@@ -1,7 +1,13 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using RecommendationApi.Extensions;
+using RecommendationApi.Models;
+using RecommendationApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 var config = builder.Configuration;
 string? allowedOrigins = config["Cors:AllowedOrigins"];
@@ -20,22 +26,10 @@ builder.Services.AddDaprClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAzureServices();
-builder.Services.AddHealthChecks();
-
-string? connectionString = config["ApplicationInsights:ConnectionString"];
-
-builder.Services.AddLogging(loggingBuilder =>
-{
-    loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>(logLevel => logLevel == LogLevel.Information);
-    loggingBuilder.SetMinimumLevel(LogLevel.Information);
-});
-
-builder.Services.AddApplicationInsightsTelemetryWorkerService(options =>
-{
-    options.ConnectionString = connectionString;
-});
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -47,7 +41,21 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors();
 
-app.MapApi();
-app.MapHealthChecks("/healthz");
+app.MapPost("/recommendation", async Task<Results<Ok<Response>, ProblemHttpResult>> (Request request, [FromServices] RecommendationService recommendationService) =>
+{
+    Response response = new Response();
+    try
+    {
+        response = await recommendationService.ResponseAsync(request);
+    }
+    catch (Exception ex)
+    {
+        return TypedResults.Problem(ex.Message);
+    }
+
+    return TypedResults.Ok(response);
+})
+.WithName("GetRecommendation")
+.WithOpenApi();
 
 app.Run();

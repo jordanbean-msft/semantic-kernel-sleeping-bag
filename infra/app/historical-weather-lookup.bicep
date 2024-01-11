@@ -83,9 +83,14 @@ module app '../core/host/container-app-upsert.bicep' = {
     serviceBinds: serviceBinds
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
-    env: []
+    env: [
+      {
+        name: 'ApplicationInsights__ConnectionString'
+        value: applicationInsights.properties.ConnectionString
+      }
+    ]
     targetPort: 8080
-    external: false
+    external: true
     daprEnabled: true
     daprAppId: 'historical-weather-lookup'
     daprAppProtocol: 'http'

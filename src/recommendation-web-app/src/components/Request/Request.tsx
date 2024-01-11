@@ -1,91 +1,48 @@
-import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import Response, { ResponseMessage, OpenAIMessage } from "../Response/Response";
-import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
 import "./Request.css";
-import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import { green } from "@mui/material/colors";
-import config from "../../config";
+import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
+import Send from "@mui/icons-material/Send";
+import { Psychology } from "@mui/icons-material";
+import Typography from "@mui/material/Typography";
 
-export default function Request() {
-  const [request, setRequest] = useState(
-    "Will my sleeping bag work for my trip to Patagonia next month?"
-  );
-  const [response, setResponse] = useState<ResponseMessage>();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
-  const [status, setStatus] = useState("");
+interface RequestProps {
+    request: string,
+    success: boolean,
+    loading: boolean,
+    setRequest: (value: string) => void,
+    handleSubmit: () => void,
+    handleClickOpen: () => void
+}
 
-  const buttonSx = {
-    ...(success && {
-      bgcolor: green[500],
-      "&:hover": {
-        bgcolor: green[700],
-      },
-    }),
-  };
-
-  return (
-    <Stack>
-      <Paper className="requestPaper">
-        <TextField
-          id="request"
-          label="Request"
-          variant="outlined"
-          value={request}
-          onChange={(e) => setRequest(e.target.value)}
-          multiline
-        />
-        <Box sx={{ m: 1, position: "relative" }}>
-          <Button variant="contained" disabled={loading} onClick={handleSubmit}>
-            Submit
-          </Button>
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                color: green[500],
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-              }}
-            />
-          )}
-        </Box>
-      </Paper>
-      {response && <Response response={response} />}
-    </Stack>
-  );
-
-  async function handleSubmit() {
-    if (!loading) {
-      setSuccess(false);
-      setLoading(true);
-      setResponse(undefined);
-
-      const response = await fetch(`${config.api.baseUrl}/recommendation`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: request }),
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        return response.json();
-      });
-
-      setResponse(response);
-      setSuccess(true);
-      setLoading(false);
-    }
-  }
+export default function Request({ request, success, loading, setRequest, handleSubmit, handleClickOpen }: RequestProps) {
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={9}>
+                <TextField
+                    size="small"
+                    id="request"
+                    label="Request"
+                    variant="outlined"
+                    value={request}
+                    onChange={(e) => setRequest(e.target.value.replace(/\n/g, ''))}
+                    fullWidth
+                    onKeyDown={(e) => (
+                        e.code === "Enter" ? handleSubmit() : null
+                    )}
+                />
+            </Grid>
+            <Grid item xs={3 }>
+                <Stack direction="row" spacing={2} >
+                    <Button fullWidth variant="contained" disabled={loading} onClick={handleSubmit} endIcon={<Send />}>
+                        <Typography>Submit</Typography>
+                    </Button>
+                    <Button fullWidth variant="contained" disabled={!success} onClick={handleClickOpen} endIcon={<Psychology />}>
+                        <Typography>Thought Process</Typography>
+                    </Button>
+                </Stack>
+            </Grid>
+        </Grid>
+    );
 }

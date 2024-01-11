@@ -40,7 +40,7 @@ param recommendationApiAppExists bool = false
 param recommendationWebAppExists bool = false
 
 @description('Location for the OpenAI resource group')
-@allowed([ 'canadaeast', 'eastus', 'eastus2', 'francecentral', 'switzerlandnorth', 'uksouth', 'japaneast', 'northcentralus' ])
+@allowed([ 'canadaeast', 'eastus', 'eastus2', 'francecentral', 'switzerlandnorth', 'uksouth', 'japaneast', 'northcentralus', 'australiaeast' ])
 @metadata({
   azd: {
     type: 'location'
@@ -64,11 +64,20 @@ param appServicePlanName string = ''
 @description('Capacity of the chat GPT deployment. Default: 30')
 param chatGptDeploymentCapacity int = 30
 
-@description('Name of the chat GPT deployment')
-param chatGptDeploymentName string = 'chat'
+@description('Name of the chat completion deployment')
+param chatCompletionDeploymentName string = 'chat'
+
+@description('ID of the chat completion model')
+param chatCompletionModelId string = '0613'
 
 @description('Name of the embedding deployment. Default: embedding')
 param embeddingDeploymentName string = 'embedding'
+
+@description('ID of the embedding model')
+param embeddingModelId string = '2'
+
+@description('Whether or not to use an API key for the OpenAI service. Default: false')
+param openAiUseApiKey bool = false
 
 @description('Capacity of the embedding deployment. Default: 30')
 param embeddingDeploymentCapacity int = 30
@@ -260,8 +269,11 @@ module api './app/recommendation-api.bicep' = {
     //searchIndexName: searchIndexName
     //formRecognizerEndpoint: formRecognizer.outputs.endpoint
     openAiEndpoint: openAi.outputs.endpoint
-    openAiChatGptDeployment: chatGptDeploymentName
-    openAiEmbeddingDeployment: embeddingDeploymentName
+    openAiChatCompletionDeploymentName: chatCompletionDeploymentName
+    openAiChatCompletionModelId: chatCompletionModelId
+    openAiEmbeddingDeploymentName: embeddingDeploymentName
+    openAiEmbeddingModelId: embeddingModelId
+    openAiUseApiKey: openAiUseApiKey
     serviceBinds: []
     corsOrigin: corsAcaUrl
   }
@@ -387,11 +399,11 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
     }
     deployments: [
       {
-        name: chatGptDeploymentName
+        name: chatCompletionDeploymentName
         model: {
           format: 'OpenAI'
           name: chatGptModelName
-          version: '0301'
+          version: chatCompletionModelId
         }
         sku: {
           name: 'Standard'
@@ -403,7 +415,7 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
         model: {
           format: 'OpenAI'
           name: embeddingModelName
-          version: '2'
+          version: embeddingModelId
         }
         sku: {
           name: 'Standard'
@@ -633,8 +645,11 @@ output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_KEY_VAULT_RESOURCE_GROUP string = keyVaultResourceGroup.name
 output AZURE_LOCATION string = location
 output AZURE_OPENAI_RESOURCE_LOCATION string = openAiResourceGroupLocation
-output AZURE_OPENAI_CHATGPT_DEPLOYMENT string = chatGptDeploymentName
+output AZURE_OPENAI_CHATCOMPLETION_DEPLOYMENT string = chatCompletionDeploymentName
+output AZURE_OPENAI_CHATCOMPLETION_MODEL_ID string = chatCompletionModelId
 output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = embeddingDeploymentName
+output AZURE_OPENAI_EMBEDDING_MODEL_ID string = embeddingModelId
+output AZURE_OPENAI_USE_API_KEY bool = openAiUseApiKey
 output AZURE_OPENAI_ENDPOINT string = openAi.outputs.endpoint
 output AZURE_OPENAI_RESOURCE_GROUP string = openAiResourceGroup.name
 output AZURE_OPENAI_SERVICE string = openAi.outputs.name
