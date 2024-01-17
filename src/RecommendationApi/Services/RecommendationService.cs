@@ -7,6 +7,7 @@ using Microsoft.SemanticKernel.Planning;
 using Microsoft.SemanticKernel.Plugins.Core;
 using Microsoft.SemanticKernel.Plugins.Memory;
 using RecommendationApi.Models;
+using RecommendationApi.NativePlugins;
 using RecommendationApi.Plugins;
 using System.Text.Json;
 
@@ -28,11 +29,12 @@ namespace RecommendationApi.Services
             _kernel = kernel;
             _memory = memory;
 
-            _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
-            _kernel.ImportPluginFromType<LocationLookupPlugin>();
-            _kernel.ImportPluginFromType<OrderHistoryPlugin>();
-            _kernel.ImportPluginFromType<ProductCatalogPlugin>();
-            _kernel.ImportPluginFromType<TextMemoryPlugin>();
+            _kernel.ImportPluginFromType<CustomerServicePlugin>();
+            //_kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
+            //_kernel.ImportPluginFromType<LocationLookupPlugin>();
+            //_kernel.ImportPluginFromType<OrderHistoryPlugin>();
+            //_kernel.ImportPluginFromType<ProductCatalogPlugin>();
+            //_kernel.ImportPluginFromType<TextMemoryPlugin>();
             _kernel.ImportPluginFromType<ConversationSummaryPlugin>();
         }
 
@@ -46,7 +48,7 @@ namespace RecommendationApi.Services
             MemoryQueryResult? result = await _memory.GetAsync(username, request.ChatId);
             if (result == null)
             {
-                chatHistory = new ChatHistory($@"System: You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. Make sure and look up any needed context for the specific user that is making the request. If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. Username: {username} Current Date: {currentDate}");
+                chatHistory = new ChatHistory($@"System: You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and use the CustomerServicePlugin to help you answer the question if the user doesn't provide all the needed information. Username: {username} Current Date: {currentDate}");
             }
             else
             {
@@ -85,36 +87,7 @@ namespace RecommendationApi.Services
             #endregion
 
             #region FunctionCallingStepwisePlanner
-            //var config = new FunctionCallingStepwisePlannerConfig
-            //{
-            //    ExecutionSettings = new OpenAIPromptExecutionSettings
-            //    {
-            //        ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-            //    }
-            //};
-
-            //var planner = new FunctionCallingStepwisePlanner(config);
-
-            //FunctionCallingStepwisePlannerResult? response = null;
-            //Response returnValue = new();
-
-            //try
-            //{
-            //    response = await planner.ExecuteAsync(_kernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. A summary of the current conversation is {{ConversationSummaryPlugin.SummarizeConversation {JsonSerializer.Serialize(request.ChatHistory.Select(x => x.Content))} }} The user question is \"{request.Message}\"");
-            //}
-            //catch (Exception ex)
-            //{
-            //    returnValue.FinalAnswer = ex.Message;
-            //}
-
-            //if (returnValue.FinalAnswer != "")
-            //{
-            //    return returnValue;
-            //}
-            //else
-            //{
-            //    return ParseResponse(response!);
-            //}
+            
             #endregion
         }
 
