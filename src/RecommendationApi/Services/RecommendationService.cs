@@ -30,25 +30,43 @@ namespace RecommendationApi.Services
             _memory = memory;
 
             _kernel.ImportPluginFromType<CustomerServicePlugin>();
-            //_kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
-            //_kernel.ImportPluginFromType<LocationLookupPlugin>();
+            _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
+            _kernel.ImportPluginFromType<LocationLookupPlugin>();
             //_kernel.ImportPluginFromType<OrderHistoryPlugin>();
-            //_kernel.ImportPluginFromType<ProductCatalogPlugin>();
-            //_kernel.ImportPluginFromType<TextMemoryPlugin>();
+            _kernel.ImportPluginFromType<ProductCatalogPlugin>();
+            _kernel.ImportPluginFromType<TextMemoryPlugin>();
             _kernel.ImportPluginFromType<ConversationSummaryPlugin>();
         }
 
         public async Task<Response> ResponseAsync(Request request)
         {
             var username = "dkschrute";
+
+            await PopulateMemoryWithOrderHistoryAsync(request, username);
+
             var currentDate = DateTime.Now.ToString("MMM-dd-yyyy");
 
             ChatHistory? chatHistory = null;
 
             MemoryQueryResult? result = await _memory.GetAsync(username, request.ChatId);
+
             if (result == null)
             {
-                chatHistory = new ChatHistory($@"System: You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and use the CustomerServicePlugin to help you answer the question if the user doesn't provide all the needed information. Username: {username} Current Date: {currentDate}");
+                var arguments = new KernelArguments
+                {
+                    ["username"] = username,
+                    ["current_date"] = currentDate,
+                    [TextMemoryPlugin.InputParam] = username,
+                    [TextMemoryPlugin.CollectionParam] = username,
+                    [TextMemoryPlugin.LimitParam] = "2",
+                    [TextMemoryPlugin.RelevanceParam] = "0.79"
+                };
+
+                var promptTemplateFactory = new KernelPromptTemplateFactory();
+
+                string systemMessage = await promptTemplateFactory.Create(new PromptTemplateConfig("You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and use the CustomerServicePlugin to help you answer the question if the user doesn't provide all the needed information. If you can't answer the question, try and use the CustomerServicePlugin to get a better, more complete answer. Order History: {{ recall $username }} Current Date: {{ $current_date }}")).RenderAsync(_kernel, arguments);
+
+                chatHistory = new ChatHistory(systemMessage);
             }
             else
             {
@@ -61,16 +79,14 @@ namespace RecommendationApi.Services
 
             _kernel.FunctionInvoked += Kernel_FunctionInvoked;
 
-            #region ChatMessage
-
             OpenAIPromptExecutionSettings promptExecutionSettings = new()
             {
-                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                    
+                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                
             };
-
+            
             var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
 
-            foreach (var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel))
+            foreach (var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings))
             {
                 chatHistory.Add(chatMessage);
             }
@@ -83,12 +99,37 @@ namespace RecommendationApi.Services
                 SemanticKernelChatHistory = chatHistory,
                 FinalAnswer = chatHistory.Last().Content!
             };
+        }
 
-            #endregion
+        private async Task PopulateMemoryWithOrderHistoryAsync(Request request, string username)
+        {
+            Dictionary<string, OrderHistory> orderHistory = new()
+            {
+                {
+                "dkschrute",
+                new OrderHistory
+                {
+                        OrderId = "1",
+                        CustomerId = "dkschrute",
+                        OrderDate = "2021-01-01",
+                        OrderTotal = "100",
+                        OrderStatus = "Shipped",
+                        OrderItems = [
+                            new() {
+                                ProductId = "12345",
+                                ProductName = "Eco Elite Sleeping Bag",
+                                ProductPrice = "100",
+                                ProductQuantity = "1"
+                            }
+                        ]
+                }
+                }
+            };
 
-            #region FunctionCallingStepwisePlanner
-            
-            #endregion
+            await _memory.SaveInformationAsync(
+                collection: username,
+                text: JsonSerializer.Serialize(orderHistory),
+                id: username);
         }
 
         private void Kernel_FunctionInvoked(object? sender, FunctionInvokedEventArgs e)

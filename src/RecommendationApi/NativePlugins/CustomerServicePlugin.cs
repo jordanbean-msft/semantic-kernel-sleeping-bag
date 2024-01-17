@@ -39,11 +39,11 @@ namespace RecommendationApi.NativePlugins
             //prevent infinite loops
             localKernel.Plugins.Remove(localKernel.Plugins["CustomerServicePlugin"]);
             
-            localKernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
-            localKernel.ImportPluginFromType<LocationLookupPlugin>();
-            localKernel.ImportPluginFromType<OrderHistoryPlugin>();
-            localKernel.ImportPluginFromType<ProductCatalogPlugin>();
-            localKernel.ImportPluginFromType<TextMemoryPlugin>();
+            //localKernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
+            //localKernel.ImportPluginFromType<LocationLookupPlugin>();
+            //localKernel.ImportPluginFromType<OrderHistoryPlugin>();
+            //localKernel.ImportPluginFromType<ProductCatalogPlugin>();
+            //localKernel.ImportPluginFromType<TextMemoryPlugin>();
             //localKernel.ImportPluginFromType<ConversationSummaryPlugin>();
 
             var config = new FunctionCallingStepwisePlannerConfig
@@ -60,7 +60,7 @@ namespace RecommendationApi.NativePlugins
 
             try
             {
-                response = await planner.ExecuteAsync(localKernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request (the username is \"{username}\"). The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The user question is \"{goal}\"", cancellationToken);
+                response = await planner.ExecuteAsync(localKernel, $"You are a customer support chatbot. You should answer the question posed by the user. Make sure and look up any needed context for the specific user that is making the request. Order History: {{recall {username} }}. The current date is \"{currentDate}\". If you don't know the answer, respond saying you don't know. Only use the plugins that are registered to help you answer the question. The user question is \"{goal}\"", cancellationToken);
             }
             catch (Exception ex)
             {
