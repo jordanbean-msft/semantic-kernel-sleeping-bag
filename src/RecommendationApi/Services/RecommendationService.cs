@@ -30,12 +30,12 @@ namespace RecommendationApi.Services
             _memory = memory;
 
             _kernel.ImportPluginFromType<CustomerServicePlugin>();
-            _kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
-            _kernel.ImportPluginFromType<LocationLookupPlugin>();
+            //_kernel.ImportPluginFromType<HistoricalWeatherLookupPlugin>();
+            //_kernel.ImportPluginFromType<LocationLookupPlugin>();
             //_kernel.ImportPluginFromType<OrderHistoryPlugin>();
-            _kernel.ImportPluginFromType<ProductCatalogPlugin>();
+            //_kernel.ImportPluginFromType<ProductCatalogPlugin>();
             _kernel.ImportPluginFromType<TextMemoryPlugin>();
-            _kernel.ImportPluginFromType<ConversationSummaryPlugin>();
+            //_kernel.ImportPluginFromType<ConversationSummaryPlugin>();
         }
 
         public async Task<Response> ResponseAsync(Request request)
@@ -52,21 +52,7 @@ namespace RecommendationApi.Services
 
             if (result == null)
             {
-                var arguments = new KernelArguments
-                {
-                    ["username"] = username,
-                    ["current_date"] = currentDate,
-                    [TextMemoryPlugin.InputParam] = username,
-                    [TextMemoryPlugin.CollectionParam] = username,
-                    [TextMemoryPlugin.LimitParam] = "2",
-                    [TextMemoryPlugin.RelevanceParam] = "0.79"
-                };
-
-                var promptTemplateFactory = new KernelPromptTemplateFactory();
-
-                string systemMessage = await promptTemplateFactory.Create(new PromptTemplateConfig("You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and use the CustomerServicePlugin to help you answer the question if the user doesn't provide all the needed information. If you can't answer the question, try and use the CustomerServicePlugin to get a better, more complete answer. Order History: {{ recall $username }} Current Date: {{ $current_date }}")).RenderAsync(_kernel, arguments);
-
-                chatHistory = new ChatHistory(systemMessage);
+                chatHistory = await SetupNewChatHistoryAsync(username, currentDate, chatHistory, request.Message);
             }
             else
             {
@@ -79,17 +65,7 @@ namespace RecommendationApi.Services
 
             _kernel.FunctionInvoked += Kernel_FunctionInvoked;
 
-            OpenAIPromptExecutionSettings promptExecutionSettings = new()
-            {
-                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions                
-            };
-            
-            var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
-
-            foreach (var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings))
-            {
-                chatHistory.Add(chatMessage);
-            }
+            await ChatAsync(chatHistory);
 
             await _memory.SaveInformationAsync(username, JsonSerializer.Serialize(chatHistory), request.ChatId);
 
@@ -99,6 +75,46 @@ namespace RecommendationApi.Services
                 SemanticKernelChatHistory = chatHistory,
                 FinalAnswer = chatHistory.Last().Content!
             };
+        }
+
+        private async Task ChatAsync(ChatHistory? chatHistory)
+        {
+            OpenAIPromptExecutionSettings promptExecutionSettings = new()
+            {
+                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+                //ToolCallBehavior = ToolCallBehavior.RequireFunction(_kernel.Plugins["CustomerServicePlugin"][0].)
+            };
+
+            var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
+
+            //YOU MUST provide the kernel that the ChatCompletionService is to use, otherwise, it won't have access to all the plugins
+            foreach (var chatMessage in await chatCompletionService.GetChatMessageContentsAsync(chatHistory, promptExecutionSettings, _kernel))
+            {
+                chatHistory.Add(chatMessage);
+            }
+        }
+
+        private async Task<ChatHistory?> SetupNewChatHistoryAsync(string username, string currentDate, ChatHistory? chatHistory, string goal)
+        {
+            var arguments = new KernelArguments
+            {
+                ["username"] = username,
+                ["current_date"] = currentDate,
+                ["goal"] = goal,
+                [TextMemoryPlugin.InputParam] = username,
+                [TextMemoryPlugin.CollectionParam] = username,
+                [TextMemoryPlugin.LimitParam] = "2",
+                [TextMemoryPlugin.RelevanceParam] = "0.79"
+            };
+
+            var promptTemplateFactory = new KernelPromptTemplateFactory();
+
+            string systemMessage = await promptTemplateFactory.Create(new PromptTemplateConfig("You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and use the CustomerServicePlugin to help you answer the question if the user doesn't provide all the needed information. If you can't answer the question, try and use the CustomerServicePlugin to get a better, more complete answer. Order History: {{ recall $username }} Current Date: {{ $current_date }} Username: {{ $username }} Goal: {{ $goal }}")).RenderAsync(_kernel, arguments);
+            //string systemMessage = await promptTemplateFactory.Create(new PromptTemplateConfig("You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and call the functions you have available to help you answer the question if the user doesn't provide all the needed information. Current Date: {{ $current_date }} Username: {{ $username }} Order History: {{ recall $username }} Goal: {{ $goal }}")).RenderAsync(_kernel, arguments);
+            //string systemMessage = await promptTemplateFactory.Create(new PromptTemplateConfig("You are a customer support chatbot. You should answer the question posed by the user. Ground your answers based upon the user's purchase history. If you don't know the answer, respond saying you don't know. Make sure and call the functions you have available to help you answer the question if the user doesn't provide all the needed information. Current Date: {{ $current_date }} Username: {{ $username }} Order History: {{ recall $username }} Goal: {{ $goal }}")).RenderAsync(_kernel, arguments);
+
+            chatHistory = new ChatHistory(systemMessage);
+            return chatHistory;
         }
 
         private async Task PopulateMemoryWithOrderHistoryAsync(Request request, string username)
